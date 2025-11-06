@@ -2,212 +2,191 @@
 
 ## Overview
 
-This implementation plan converts the EconAgent-Light design into a series of coding tasks that build incrementally on the original ACL24-EconAgent codebase. Each task focuses on specific code implementation while preserving the economic logic and migrating to Mesa + LightAgent + local LLM architecture.
+This implementation plan creates a local MVP of EconAgent-Light with real-time FRED data integration and a professional React/Tailwind frontend. The focus is on core functionality that works locally without complex deployment requirements. Each task builds incrementally toward a working system with Mesa simulation, LightAgent framework, local Nemotron LLM, and beautiful web interface.
 
 ## Implementation Tasks
 
-- [x] 1. Project Setup and Original Code Integration
-  - Clone and analyze the original ACL24-EconAgent repository structure
-  - Create new project structure integrating original economic logic with Mesa/LightAgent
-  - Setup development environment with Mesa, LightAgent, and local LLM dependencies
-  - Extract and document original economic parameters and equations from config.yaml and simulate.py
-  - _Requirements: 1.1, 5.1, 5.2_
+- [x] 1. Project Setup and Clean Architecture
+  - Create clean project structure separating frontend (React) and backend (FastAPI)
+  - Setup development environment with React, Tailwind CSS, FastAPI, Mesa, and LightAgent
+  - Configure local development workflow with hot reloading for both frontend and backend
+  - Clean up existing codebase and remove unnecessary files/documentation
+  - _Requirements: 6.1, 6.2_
 
-- [ ] 2. Local LLM Client Implementation
-  - [x] 2.1 Implement NemotronClient for local Docker communication
-    - Create HTTP client for NVIDIA Nemotron Docker container at localhost:8000
-    - Implement OpenAI-compatible request/response format
-    - Add error handling, retries, and connection validation
-    - _Requirements: 1.2, 3.3, 5.4_
+- [ ] 2. FRED Data Integration (Real Economic Data)
+  - [ ] 2.1 Enhance FRED client for MVP needs
+    - Improve existing FRED client with better error handling and caching
+    - Add methods for fetching key economic indicators (unemployment, inflation, GDP, wages)
+    - Implement local file-based caching to avoid API rate limits
+    - Create data validation and quality checks for FRED responses
+    - _Requirements: 1.1, 1.4, 7.2_
   
-  - [x] 2.2 Add Ollama fallback client
-    - Implement Ollama client as backup LLM service at localhost:11434
-    - Create unified interface for switching between Nemotron and Ollama
-    - Add service health checking and automatic fallback logic
-    - _Requirements: 1.3, 8.4_
+  - [ ] 2.2 Create economic data calibration system
+    - Build calibration engine that adjusts simulation parameters based on current FRED data
+    - Implement automatic parameter scaling using historical economic trends
+    - Create economic snapshot functionality for initializing simulations with real conditions
+    - Add validation reports comparing simulation outputs with FRED benchmarks
+    - _Requirements: 1.2, 7.1, 7.3_
   
-  - [x] 2.3 Implement response validation and caching
-    - Create JSON schema validation for agent decisions (work/consumption in [0,1] with 0.02 steps)
-    - Implement value clamping and normalization functions
-    - Add in-memory caching for identical prompts to reduce LLM calls
-    - Create fallback decision logic when LLM fails (work=0.2, consumption=0.1)
-    - _Requirements: 3.4, 8.2_
+  - [ ] 2.3 Build FRED data API endpoints
+    - Create FastAPI endpoints for serving current economic data to frontend
+    - Implement caching layer to serve FRED data efficiently
+    - Add endpoints for historical data and trend analysis
+    - Create data export functionality for economic indicators
+    - _Requirements: 1.5, 5.1_
 
-- [ ] 3. LightAgent Integration Layer
-  - [x] 3.1 Create LightAgentWrapper class
-    - Initialize LightAgent with mem0 memory system
-    - Configure Tree-of-Thought reasoning for economic decisions
-    - Setup economic tools for environment data access
-    - Integrate with local LLM clients (Nemotron/Ollama)
-    - _Requirements: 2.1, 2.2, 2.5_
+- [ ] 3. React Frontend with Professional UI
+  - [ ] 3.1 Create React application with Tailwind CSS
+    - Initialize React app with TypeScript and Tailwind CSS configuration
+    - Create professional dashboard layout with responsive design
+    - Implement clean component architecture with proper TypeScript types
+    - Setup development server with hot reloading and proxy to backend API
+    - _Requirements: 2.1, 2.2, 6.3_
   
-  - [x] 3.2 Implement economic decision-making interface
-    - Create decide() method that takes agent profile and environment snapshot
-    - Build economic context prompts using original simulate.py prompt logic
-    - Process LLM responses and return validated work/consumption decisions
-    - Handle quarterly reflection prompts and memory updates
-    - _Requirements: 6.1, 6.4, 6.5_
+  - [ ] 3.2 Build simulation control components
+    - Create simulation configuration form with validation
+    - Implement parameter controls for agents, years, and economic scenarios
+    - Add FRED calibration toggle and real-time parameter preview
+    - Create start/stop simulation controls with status indicators
+    - _Requirements: 2.3, 5.2_
   
-  - [x] 3.3 Setup memory and learning system
-    - Configure mem0 for storing agent dialogues and reflections (L=1 month window)
-    - Implement quarterly reflection mechanism using LightAgent self-learning
-    - Create memory retrieval for decision-making context
-    - Add learning pattern tracking and behavioral adaptation
-    - _Requirements: 2.3, 2.4_
+  - [ ] 3.3 Implement economic data visualization
+    - Create interactive charts using Chart.js for economic indicators
+    - Build FRED data display panels showing current economic conditions
+    - Implement simulation results visualization with comparison to FRED data
+    - Add export functionality for charts and data tables
+    - _Requirements: 5.1, 5.3, 5.4_
 
-- [ ] 4. Mesa Model Implementation
-  - [x] 4.1 Create EconModel class extending Mesa.Model
-    - Migrate original config.yaml parameters to Mesa model initialization
-    - Setup Mesa RandomActivationByType scheduler for agent coordination
-    - Initialize economic environment variables (price, wages, interest rates, taxes)
-    - Create DataCollector for tracking economic indicators
-    - _Requirements: 1.1, 1.4, 7.3, 7.4, 7.5_
+- [ ] 4. FastAPI Backend for Local Development
+  - [ ] 4.1 Create simple FastAPI application
+    - Setup FastAPI with CORS enabled for React frontend communication
+    - Create basic project structure with routers for simulations and data
+    - Implement health check and service status endpoints
+    - Add static file serving for React build (optional for production)
+    - _Requirements: 3.1, 3.2, 6.4_
   
-  - [x] 4.2 Implement economic environment dynamics
-    - Port original price and wage update equations from simulate.py
-    - Implement progressive taxation using 2018 U.S. Federal tax brackets
-    - Add tax collection and redistribution logic
-    - Create interest rate updates using Taylor rule
-    - _Requirements: 7.1, 7.2, 7.3, 7.4_
+  - [ ] 4.2 Build simulation management API
+    - Create endpoints for starting simulations with configuration
+    - Implement background task execution for long-running simulations
+    - Add simulation status and progress monitoring endpoints
+    - Create results retrieval and export endpoints
+    - _Requirements: 3.3, 3.5_
   
-  - [x] 4.3 Create model step() method
-    - Implement monthly simulation step replicating original simulate.py logic
-    - Coordinate agent decision-making phase
-    - Execute economic calculations (production, consumption, market updates)
-    - Trigger quarterly reflections every 3 months
-    - Collect and store economic metrics
-    - _Requirements: 1.4, 6.3, 7.5_
+  - [ ] 4.3 Integrate FRED data with simulation API
+    - Connect FRED data manager to simulation configuration
+    - Implement automatic calibration when starting simulations
+    - Create endpoints for serving current economic data to frontend
+    - Add validation and comparison endpoints for simulation results
+    - _Requirements: 1.3, 7.4, 7.5_
 
-- [ ] 5. Economic Agent Implementation
-  - [x] 5.1 Create EconAgent class extending Mesa.Agent
-    - Port original agent attributes from ai-economist BasicMobileAgent
-    - Initialize agent profile (skill, wealth, job, demographics) using original distributions
-    - Integrate LightAgentWrapper for intelligent decision-making
-    - Setup agent memory system and learning capabilities
-    - _Requirements: 2.1, 6.2, 6.3_
+- [ ] 5. Enhanced Mesa Simulation with FRED Integration
+  - [ ] 5.1 Upgrade existing Mesa model for FRED calibration
+    - Modify existing EconModel to accept FRED-calibrated parameters
+    - Integrate real economic conditions as initial simulation state
+    - Add FRED data validation and comparison during simulation
+    - Implement progress tracking and results export functionality
+    - _Requirements: 1.2, 7.1, 7.3_
   
-  - [x] 5.2 Implement agent step() method
-    - Build economic context snapshot for LightAgent decision-making
-    - Call LightAgent for work propensity and consumption decisions
-    - Apply decisions using original economic formulas
-    - Update agent financial state (income, savings, taxes, consumption)
-    - _Requirements: 6.2, 6.3, 6.4_
+  - [ ] 5.2 Enhance economic agents with real-world context
+    - Update existing EconAgent to use current economic conditions in decision-making
+    - Integrate FRED data into agent prompts and context
+    - Improve agent decision-making with real economic indicators
+    - Add agent behavior tracking and analysis capabilities
+    - _Requirements: 4.2, 4.4, 4.5_
   
-  - [x] 5.3 Add quarterly reflection mechanism
-    - Implement reflect() method called every 3 months by model
-    - Use LightAgent to process quarterly economic data and generate insights
-    - Update agent memory and learning patterns
-    - Store reflection results for future decision-making
-    - _Requirements: 2.4, 6.5_
+  - [ ] 5.3 Implement simulation orchestration
+    - Create simulation runner that coordinates FRED data, calibration, and execution
+    - Add real-time progress monitoring and status updates
+    - Implement result validation against FRED benchmarks
+    - Create comprehensive simulation reports with FRED comparisons
+    - _Requirements: 7.4, 7.5_
 
-- [ ] 6. Prompt Templates and Economic Tools
-  - [x] 6.1 Create economic prompt templates
-    - Port original problem_prompt, job_prompt, and economic context from simulate.py
-    - Implement perception prompts with economic indicators and personal history
-    - Create quarterly reflection prompts for learning and adaptation
-    - Add prompt formatting and prettification functions
-    - _Requirements: 6.1, 6.4_
+- [ ] 6. LightAgent Integration with Local Nemotron
+  - [ ] 6.1 Setup local Nemotron LLM integration
+    - Configure existing LightAgent wrapper to use local Nemotron
+    - Implement proper error handling and fallback mechanisms
+    - Add response validation and economic decision parsing
+    - Create agent memory system using mem0 with economic context
+    - _Requirements: 4.1, 4.3_
   
-  - [x] 6.2 Implement economic tools for LightAgent
-    - Create tools for accessing current economic indicators (price, unemployment, inflation)
-    - Add tax bracket and rate lookup tools
-    - Implement market condition analysis tools
-    - Create personal financial history access tools
-    - _Requirements: 2.5, 7.1, 7.2_
+  - [ ] 6.2 Enhance agent prompts with FRED data context
+    - Update existing prompt templates to include real economic conditions
+    - Integrate current FRED data into agent decision-making context
+    - Implement dynamic prompt generation based on economic scenarios
+    - Add quarterly reflection prompts incorporating real economic trends
+    - _Requirements: 4.4, 4.5_
 
-- [ ] 7. Batch Processing and Performance Optimization
-  - [ ] 7.1 Implement concurrent agent processing
-    - Create batch processing for multiple agent LLM requests
-    - Add configurable thread pool for parallel processing
-    - Implement request queuing and response aggregation
-    - Add error handling for batch failures with individual fallbacks
-    - _Requirements: 3.1, 8.1_
+- [ ] 7. Local Development Setup and Documentation
+  - [ ] 7.1 Create development environment setup
+    - Write clear setup instructions for local development
+    - Create startup scripts for backend and frontend development servers
+    - Document Nemotron setup and configuration requirements
+    - Add troubleshooting guide for common development issues
+    - _Requirements: 6.5_
   
-  - [ ] 7.2 Add performance monitoring and optimization
-    - Implement caching hit rate monitoring
-    - Add LLM request timing and success rate tracking
-    - Create performance profiling for bottleneck identification
-    - Add resource usage monitoring for local LLM services
-    - _Requirements: 8.5_
+  - [ ] 7.2 Implement local file management
+    - Create local file storage for simulation results and FRED cache
+    - Implement export functionality for simulation data (CSV, Excel, JSON)
+    - Add file cleanup and management utilities
+    - Create backup and restore functionality for simulation data
+    - _Requirements: 5.5_
 
-- [ ] 8. Data Collection and Visualization
-  - [x] 8.1 Implement comprehensive data collection
-    - Create DataCollector configuration for all economic indicators
-    - Track inflation, unemployment, GDP, wage levels, and tax revenue
-    - Collect agent-level data (decisions, wealth, consumption patterns)
-    - Store simulation results in structured format for analysis
-    - _Requirements: 1.5, 4.4_
+- [ ] 8. Testing and Quality Assurance
+  - [ ] 8.1 Create frontend component tests
+    - Write unit tests for React components using React Testing Library
+    - Test simulation controls, charts, and data display components
+    - Add integration tests for API communication and data flow
+    - Implement visual regression testing for UI consistency
+    - _Requirements: 9.1, 9.3_
   
-  - [x] 8.2 Create visualization and analysis tools
-    - Implement plotting functions for key economic indicators over time
-    - Create Phillips curve and Okun's law analysis (replicating original paper figures)
-    - Add agent behavior analysis and decision pattern visualization
-    - Generate comparison reports between original and new implementation
-    - _Requirements: 1.5_
+  - [ ] 8.2 Build backend API tests
+    - Create unit tests for FastAPI endpoints and business logic
+    - Test FRED data integration and caching functionality
+    - Add simulation execution and result validation tests
+    - Implement error handling and edge case testing
+    - _Requirements: 9.2, 9.4_
 
-- [ ] 9. CLI Interface and Configuration
-  - [x] 9.1 Create command-line interface
-    - Implement CLI with configurable parameters (agents, years, batch size, seeding)
-    - Add local LLM service configuration options
-    - Create quick debugging mode with reduced parameters
-    - Add verbose logging and progress reporting
-    - _Requirements: 5.2, 5.3_
+- [ ] 9. Code Cleanup and Organization
+  - [ ] 9.1 Clean up existing codebase
+    - Remove unnecessary files, old documentation, and unused code
+    - Organize code into clear frontend/backend separation
+    - Update file structure to match new architecture
+    - Add proper TypeScript types and Python type hints throughout
+    - _Requirements: 6.1, 6.2_
   
-  - [x] 9.2 Add Docker and service management scripts
-    - Create automated scripts for starting Nemotron Docker container
-    - Add Ollama service setup and configuration scripts
-    - Implement service health checking and startup validation
-    - Create environment setup and dependency installation scripts
-    - _Requirements: 5.1, 5.4_
+  - [ ] 9.2 Create comprehensive documentation
+    - Write clear README with setup and usage instructions
+    - Document API endpoints and data models
+    - Create user guide for the web interface
+    - Add developer documentation for extending the system
+    - _Requirements: 6.5_
 
-- [ ] 10. Testing and Validation
-  - [ ] 10.1 Create unit tests for core components
-    - Test local LLM clients with mock responses
-    - Validate economic calculations against original formulas
-    - Test LightAgent integration and memory systems
-    - Verify Mesa model step execution and data collection
-    - _Requirements: 4.1, 4.4_
+- [ ] 10. Final Integration and Polish
+  - [ ] 10.1 Complete end-to-end integration
+    - Connect all components: React frontend, FastAPI backend, FRED data, Mesa simulation
+    - Test complete workflow from configuration to results visualization
+    - Ensure smooth data flow and error handling throughout the system
+    - Validate FRED calibration and simulation accuracy
+    - _Requirements: 1.1, 1.5, 7.5_
   
-  - [ ] 10.2 Implement integration tests
-    - Create end-to-end simulation tests with small agent populations (N=10)
-    - Validate economic indicators remain within expected ranges
-    - Test batch processing and concurrent agent execution
-    - Verify memory persistence and learning mechanisms
-    - _Requirements: 4.2, 4.4_
-  
-  - [ ]* 10.3 Add performance benchmarking
-    - Create benchmarks comparing original vs new implementation performance
-    - Test scalability with different agent population sizes
-    - Measure LLM request efficiency and caching effectiveness
-    - Validate resource usage under different hardware configurations
-    - _Requirements: 4.5, 8.1, 8.5_
+  - [ ] 10.2 Polish user experience and interface
+    - Refine UI/UX with professional styling and smooth interactions
+    - Add loading states, progress indicators, and user feedback
+    - Implement responsive design for different screen sizes
+    - Add keyboard shortcuts and accessibility features
+    - _Requirements: 2.4, 5.4_
 
-- [ ] 11. Documentation and Deployment
-  - [x] 11.1 Create comprehensive documentation
-    - Write detailed setup instructions for local LLM services
-    - Document migration from original codebase and key differences
-    - Create user guide for running simulations and interpreting results
-    - Add troubleshooting guide for common issues
-    - _Requirements: 5.3, 5.5_
+- [ ]* 11. Optional Enhancements (Future Improvements)
+  - [ ]* 11.1 Advanced visualization features
+    - Add interactive 3D visualizations for agent behavior patterns
+    - Implement real-time animation of economic dynamics
+    - Create advanced filtering and analysis tools for simulation data
+    - Add comparison tools for multiple simulation runs
+    - _Requirements: 5.3_
   
-  - [ ] 11.2 Add reproducibility and validation
-    - Create scripts to reproduce original paper results
-    - Add deterministic seeding for experiment reproducibility
-    - Implement result validation against original simulation outputs
-    - Create example notebooks demonstrating key features
-    - _Requirements: 3.5, 9.3_
-
-- [ ]* 12. Advanced Features and Optimizations
-  - [ ]* 12.1 Implement advanced LightAgent features
-    - Add Tree-of-Thought reasoning with multiple candidate evaluation
-    - Implement advanced memory management with configurable retention policies
-    - Create agent collaboration mechanisms for market information sharing
-    - Add adaptive tool selection based on economic conditions
-    - _Requirements: 2.2_
-  
-  - [ ]* 12.2 Add experimental economic extensions
-    - Implement additional economic scenarios beyond the original paper
-    - Add support for different tax policies and economic interventions
-    - Create agent heterogeneity experiments with different behavioral patterns
-    - Add economic shock simulation capabilities
-    - _Requirements: 7.1, 7.2_
+  - [ ]* 11.2 Performance optimizations
+    - Implement agent decision batching for faster LLM processing
+    - Add simulation state caching and resume functionality
+    - Create parallel processing for large agent populations
+    - Add memory optimization for long-running simulations
+    - _Requirements: 8.1_

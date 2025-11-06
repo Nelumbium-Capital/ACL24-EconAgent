@@ -1,34 +1,43 @@
-# Core dependencies
-mesa>=3.0.0
-requests>=2.28.0
-numpy>=1.21.0
-pandas>=1.3.0
-matplotlib>=3.5.0
-seaborn>=0.11.0
+# FastAPI and web server
+fastapi>=0.104.1
+uvicorn[standard]>=0.24.0
+python-multipart>=0.0.6
 
-# Web UI
-streamlit>=1.28.0
-plotly>=5.15.0
+# Data processing and analysis
+pandas>=2.1.0
+numpy>=1.24.0
+requests>=2.31.0
 
-# Memory and AI (optional)
-# lightagent>=0.4.0
-# mem0ai>=0.1.0
-pydantic>=2.0.0
+# Economic data and simulation
+mesa>=2.1.0
+scipy>=1.11.0
 
-# Utilities
-tqdm>=4.64.0
-python-dotenv>=0.19.0
-pyyaml>=6.0
-fire>=0.4.0
+# Configuration and utilities
+pydantic>=2.4.0
+python-dotenv>=1.0.0
+pathlib>=1.0.1
+
+# Date and time handling
+python-dateutil>=2.8.2
+
+# Logging and monitoring
+structlog>=23.1.0
 
 # Testing (optional)
-pytest>=7.0.0
-pytest-cov>=4.0.0
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+httpx>=0.25.0
 
-# Development (optional)
-jupyter>=1.0.0
-black>=22.0.0
-flake8>=5.0.0
+# Development tools (optional)
+black>=23.9.0
+isort>=5.12.0
+flake8>=6.1.0
 
-# Performance
-openpyxl>=3.0.0  # For Excel file support
+# LightAgent framework (if available via pip)
+# lightagent>=0.4.0
+
+# Memory and AI tools
+# mem0>=0.1.0
+
+# Note: If LightAgent or mem0 are not available via pip,
+# they should be installed manually or vendored in the project

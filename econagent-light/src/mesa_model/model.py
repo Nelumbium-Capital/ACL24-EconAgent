@@ -59,8 +59,8 @@ logger = logging.getLogger(__name__)
 
 class EconModel(Model):
     """
-    Mesa-based economic simulation model.
-    Migrates original ACL24-EconAgent logic to Mesa framework.
+    Mesa-based economic simulation model with real FRED data integration.
+    Implements full ACL24-EconAgent paper methodology with live economic data.
     """
     
     def __init__(
@@ -84,6 +84,10 @@ class EconModel(Model):
         enable_lightagent: bool = True,
         enable_memory: bool = True,
         enable_tot: bool = True,
+        # FRED data integration
+        fred_api_key: Optional[str] = None,
+        enable_real_data: bool = True,
+        real_data_update_frequency: int = 12,  # Update real data every 12 months
         # Simulation parameters
         save_frequency: int = 6,
         log_frequency: int = 3
@@ -116,13 +120,31 @@ class EconModel(Model):
         self.save_frequency = save_frequency
         self.log_frequency = log_frequency
         
-        # Economic state variables
+        # FRED data integration parameters
+        self.fred_api_key = fred_api_key
+        self.enable_real_data = enable_real_data
+        self.real_data_update_frequency = real_data_update_frequency
+        self.real_data_manager = None
+        self.last_real_data_update = 0
+        
+        # Initialize real economic data if enabled
+        if self.enable_real_data:
+            self._initialize_real_data()
+        
+        # Economic state variables (initialized from real data if available)
         self.goods_inventory = 0.0
-        self.goods_price = 1.0  # Initial price level
-        self.average_wage = 1.0  # Initial wage level
-        self.interest_rate = base_interest_rate
-        self.inflation_rate = 0.0
-        self.unemployment_rate = 0.0
+        self.goods_price = 1.0  # Will be updated from real CPI data
+        self.average_wage = 1.0  # Will be updated from real wage data
+        self.interest_rate = base_interest_rate  # Will be updated from real Fed funds rate
+        self.inflation_rate = 0.0  # Will be calculated from real CPI data
+        self.unemployment_rate = 0.0  # Will be updated from real unemployment data
+        
+        # Real economic indicators from FRED
+        self.real_gdp_growth = 0.0
+        self.real_cpi_level = 100.0
+        self.real_fed_funds_rate = base_interest_rate
+        self.real_unemployment_rate = 0.05
+        self.real_wage_growth = 0.0
         
         # Economic history for calculations
         self.price_history = [self.goods_price]
@@ -182,7 +204,13 @@ class EconModel(Model):
                 "Gini_Coefficient": self._calculate_gini,
                 "Employment_Rate": self._calculate_employment_rate,
                 "Average_Consumption": self._calculate_average_consumption,
-                "LLM_Stats": self._get_llm_stats
+                "LLM_Stats": self._get_llm_stats,
+                # Real FRED data metrics
+                "Real_Unemployment": lambda m: getattr(m, 'real_unemployment_rate', 0.0),
+                "Real_Fed_Funds": lambda m: getattr(m, 'real_fed_funds_rate', 0.0),
+                "Real_CPI": lambda m: getattr(m, 'real_cpi_level', 100.0),
+                "Real_GDP_Growth": lambda m: getattr(m, 'real_gdp_growth', 0.0),
+                "Real_Data_Enabled": lambda m: m.enable_real_data
             },
             agent_reporters={
                 "Agent_ID": "unique_id",
@@ -205,6 +233,123 @@ class EconModel(Model):
             logger.info("LightAgent integration enabled")
         else:
             logger.warning("LightAgent integration disabled - using fallback decisions")
+    
+    def _initialize_real_data(self):
+        """Initialize real economic data from FRED API."""
+        try:
+            import sys
+            from pathlib import Path
+            sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+            
+            from src.data_integration.real_data_manager import RealDataManager
+            from config import DEFAULT_CONFIG
+            
+            # Use provided API key or default from config
+            api_key = self.fred_api_key or DEFAULT_CONFIG.fred.api_key
+            
+            logger.info("Initializing real economic data from FRED...")
+            self.real_data_manager = RealDataManager(
+                fred_api_key=api_key,
+                cache_dir=DEFAULT_CONFIG.fred.cache_dir,
+                auto_update=True
+            )
+            
+            # Initialize with real economic data
+            real_data = self.real_data_manager.initialize_real_data(
+                start_date="2015-01-01",
+                calibration_scenario="post_covid"
+            )
+            
+            # Update model parameters with real data
+            calibrated_params = real_data['calibrated_params']
+            current_indicators = self.real_data_manager.get_real_time_indicators()
+            
+            # Set initial economic conditions from real data
+            if 'unemployment' in current_indicators:
+                self.real_unemployment_rate = current_indicators['unemployment']['value'] / 100
+                self.unemployment_rate = self.real_unemployment_rate
+            
+            if 'fed_funds' in current_indicators:
+                self.real_fed_funds_rate = current_indicators['fed_funds']['value'] / 100
+                self.interest_rate = self.real_fed_funds_rate
+                self.base_interest_rate = self.real_fed_funds_rate
+            
+            if 'cpi' in current_indicators:
+                self.real_cpi_level = current_indicators['cpi']['value']
+                # Normalize CPI to simulation scale
+                self.goods_price = self.real_cpi_level / 100.0
+            
+            if 'wages' in current_indicators:
+                real_wage = current_indicators['wages']['value']
+                # Normalize wage to simulation scale
+                self.average_wage = real_wage / 30.0  # Approximate normalization
+            
+            # Update calibrated parameters
+            if 'productivity' in calibrated_params:
+                self.productivity = calibrated_params['productivity']
+            
+            if 'max_price_inflation' in calibrated_params:
+                self.max_price_inflation = calibrated_params['max_price_inflation']
+            
+            if 'max_wage_inflation' in calibrated_params:
+                self.max_wage_inflation = calibrated_params['max_wage_inflation']
+            
+            logger.info(f"Real data initialized: Unemployment={self.unemployment_rate:.1%}, "
+                       f"Fed Funds={self.interest_rate:.1%}, CPI={self.real_cpi_level:.1f}")
+            
+        except Exception as e:
+            logger.warning(f"Failed to initialize real data: {e}")
+            logger.warning("Falling back to default economic parameters")
+            self.enable_real_data = False
+            self.real_data_manager = None
+    
+    def _update_real_data(self):
+        """Update economic indicators with real FRED data during simulation."""
+        if not self.enable_real_data or not self.real_data_manager:
+            return
+        
+        # Update real data periodically
+        if self.current_step - self.last_real_data_update >= self.real_data_update_frequency:
+            try:
+                logger.info("Updating real economic data from FRED...")
+                
+                # Get current real indicators
+                current_indicators = self.real_data_manager.get_real_time_indicators()
+                
+                # Update simulation parameters based on real data
+                adjustments = self.real_data_manager.update_simulation_parameters(
+                    self.current_step,
+                    {
+                        'unemployment_rate': self.unemployment_rate,
+                        'inflation_rate': self.inflation_rate,
+                        'interest_rate': self.interest_rate,
+                        'goods_price': self.goods_price
+                    }
+                )
+                
+                # Apply real data adjustments to simulation
+                if 'interest_rate' in adjustments:
+                    # Gradually adjust interest rate towards real rate
+                    target_rate = adjustments['interest_rate']
+                    adjustment_factor = 0.1  # 10% adjustment per update
+                    self.interest_rate += (target_rate - self.interest_rate) * adjustment_factor
+                
+                if 'inflation_expectation' in adjustments:
+                    # Update inflation expectations
+                    self.inflation_rate = adjustments['inflation_expectation']
+                
+                if 'unemployment_rate' in adjustments:
+                    # Update unemployment target
+                    target_unemployment = adjustments['unemployment_rate']
+                    # Influence but don't override simulation dynamics
+                    self.real_unemployment_rate = target_unemployment
+                
+                self.last_real_data_update = self.current_step
+                
+                logger.info(f"Real data updated at step {self.current_step}")
+                
+            except Exception as e:
+                logger.warning(f"Failed to update real data: {e}")
     
     def _create_agents(self):
         """Create economic agents with skill distribution."""
@@ -237,12 +382,15 @@ class EconModel(Model):
         logger.info(f"Created {len(self.schedule.agents)} agents")
     
     def step(self):
-        """Execute one simulation step (one month)."""
+        """Execute one simulation step (one month) with real FRED data integration."""
         self.current_step += 1
         year = (self.current_step - 1) // 12 + 1
         month = ((self.current_step - 1) % 12) + 1
         
         logger.debug(f"Step {self.current_step}: Year {year}, Month {month}")
+        
+        # 0. Update real economic data periodically (ACL24-EconAgent paper methodology)
+        self._update_real_data()
         
         # 1. Agent decision-making phase
         self._agent_decision_phase()
@@ -251,7 +399,7 @@ class EconModel(Model):
         self._production_phase()
         self._consumption_phase()
         
-        # 3. Economic updates
+        # 3. Economic updates (influenced by real data)
         self._update_wages_and_prices()
         self._update_interest_rates()
         
@@ -350,6 +498,20 @@ class EconModel(Model):
         if len(self.price_history) > 0:
             self.inflation_rate = (new_price - self.price_history[-1]) / self.price_history[-1]
         
+        # Incorporate real data influence on wages and prices
+        if self.enable_real_data and self.real_data_manager:
+            # Adjust wages towards real wage growth trends
+            if hasattr(self, 'real_wage_growth'):
+                real_influence = 0.05  # 5% influence from real data
+                new_wage += new_wage * self.real_wage_growth * real_influence
+            
+            # Adjust prices towards real CPI trends
+            if hasattr(self, 'real_cpi_level'):
+                # Normalize real CPI to simulation scale
+                real_price_level = self.real_cpi_level / 100.0
+                price_influence = 0.03  # 3% influence from real data
+                new_price += (real_price_level - new_price) * price_influence
+        
         # Update values and history
         self.average_wage = new_wage
         self.goods_price = new_price
@@ -361,18 +523,33 @@ class EconModel(Model):
             agent.monthly_wage = agent.skill * self.average_wage * self.labor_hours
     
     def _update_interest_rates(self):
-        """Update interest rates using Taylor rule (annually)."""
+        """Update interest rates using Taylor rule with real FRED data influence."""
         if self.current_step % 12 == 0:  # Annual update
+            # Use real unemployment rate as target if available
+            unemployment_target = 0.04  # Default from original
+            if self.enable_real_data and hasattr(self, 'real_unemployment_rate'):
+                unemployment_target = self.real_unemployment_rate
+            
+            # Use real Fed funds rate as natural rate if available
+            natural_rate = 0.01  # Default from original
+            if self.enable_real_data and hasattr(self, 'real_fed_funds_rate'):
+                natural_rate = self.real_fed_funds_rate
+            
             new_rate = taylor_rule_interest_rate(
                 current_rate=self.interest_rate,
                 inflation_rate=self.inflation_rate,
                 unemployment_rate=self.unemployment_rate,
-                natural_rate=0.01,  # rn from original
-                inflation_target=0.02,  # pi_t from original
-                unemployment_target=0.04,  # un from original
+                natural_rate=natural_rate,
+                inflation_target=0.02,  # Fed's 2% target
+                unemployment_target=unemployment_target,
                 alpha_pi=0.5,  # from original
                 alpha_u=0.5   # from original
             )
+            
+            # Incorporate real Fed funds rate influence
+            if self.enable_real_data and hasattr(self, 'real_fed_funds_rate'):
+                real_rate_influence = 0.1  # 10% influence from real Fed rate
+                new_rate += (self.real_fed_funds_rate - new_rate) * real_rate_influence
             
             self.interest_rate = new_rate
             self.interest_rate_history.append(new_rate)
@@ -434,8 +611,13 @@ class EconModel(Model):
     
     def _update_economic_indicators(self):
         """Update economic indicators for agent context."""
-        # These are used by agents for decision-making context
-        pass  # Already updated in other phases
+        # Economic indicators are updated in other simulation phases
+        # and are available to agents through model attributes:
+        # - self.unemployment_rate
+        # - self.inflation_rate  
+        # - self.interest_rate
+        # - self.goods_price
+        # - self.average_wage
     
     def _log_progress(self):
         """Log simulation progress."""

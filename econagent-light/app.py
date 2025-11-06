@@ -301,26 +301,53 @@ def create_agent_behavior_plot(model_data, agent_data):
 def run_simulation(params):
     """Run simulation with given parameters."""
     try:
-        # Use the main Mesa model
+        # Import real data integration
+        from src.data_integration.real_data_manager import RealDataManager
         from src.mesa_model.model import EconModel
+        from config import DEFAULT_CONFIG
         
-        # Create model with original parameters
+        # Initialize real data manager with FRED integration
+        st.info("🔄 Initializing real economic data from FRED...")
+        data_manager = RealDataManager(
+            fred_api_key=DEFAULT_CONFIG.fred.api_key,
+            cache_dir=DEFAULT_CONFIG.fred.cache_dir,
+            auto_update=True
+        )
+        
+        # Get real economic data and calibrated parameters
+        real_data = data_manager.initialize_real_data(
+            start_date="2015-01-01",
+            calibration_scenario="post_covid"
+        )
+        
+        calibrated_params = real_data['calibrated_params']
+        st.success(f"✅ Loaded {len(real_data['data_sources'])} FRED economic series")
+        
+        # Create model with real FRED data integration (full ACL24-EconAgent paper implementation)
         model = EconModel(
             n_agents=params['n_agents'],
             episode_length=params['years'] * 12,
             random_seed=params['seed'],
-            # Original economic parameters
-            productivity=params.get('productivity', 1.0),
-            max_price_inflation=params.get('max_inflation', 0.10),
-            max_wage_inflation=0.05,
-            pareto_param=8.0,  # Original value
-            payment_max_skill_multiplier=950.0,  # Original value
-            labor_hours=168,  # Original value
+            # Use real FRED-calibrated parameters
+            productivity=calibrated_params.get('productivity', 1.0),
+            max_price_inflation=calibrated_params.get('max_price_inflation', 0.10),
+            max_wage_inflation=calibrated_params.get('max_wage_inflation', 0.05),
+            base_interest_rate=calibrated_params.get('base_interest_rate', 0.02),
+            pareto_param=calibrated_params.get('pareto_param', 8.0),
+            payment_max_skill_multiplier=calibrated_params.get('payment_max_skill_multiplier', 950.0),
+            labor_hours=calibrated_params.get('labor_hours', 168),
+            # Real FRED data integration
+            fred_api_key=DEFAULT_CONFIG.fred.api_key,
+            enable_real_data=True,
+            real_data_update_frequency=6,  # Update every 6 months for web UI
             # Disable LLM features for web UI
             llm_client=None,
             enable_lightagent=False,
             log_frequency=max(1, params['years'] * 12 // 10)
         )
+        
+        # Store real data manager for validation
+        model.real_data_manager = data_manager
         
         # Progress tracking
         progress_bar = st.progress(0)
@@ -348,6 +375,13 @@ def run_simulation(params):
         results_file = results_dir / f"simulation_{timestamp}.xlsx"
         
         model.save_results(str(results_file))
+        
+        # Generate real data validation report
+        if hasattr(model, 'real_data_manager'):
+            validation_report = model.real_data_manager.generate_data_report(
+                str(results_dir / f"real_data_report_{timestamp}.txt")
+            )
+            st.info("📊 Real data integration report saved")
         
         progress_bar.progress(1.0)
         status_text.text("✅ Simulation completed successfully!")

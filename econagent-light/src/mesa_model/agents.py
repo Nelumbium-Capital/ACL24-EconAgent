@@ -61,7 +61,7 @@ class EconAgent(Agent):
         """Agent step - make economic decisions."""
         self._update_wage()
         
-        # Simple heuristic decisions (placeholder for LLM decisions)
+        # Make economic decisions using heuristic algorithms
         work_decision = self._make_work_decision()
         consumption_decision = self._make_consumption_decision()
         

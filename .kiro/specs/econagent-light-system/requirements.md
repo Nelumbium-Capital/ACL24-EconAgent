@@ -2,129 +2,133 @@
 
 ## Introduction
 
-This document specifies the requirements for reproducing and improving the EconAgent paper system using Mesa for ABM simulation, LightAgent framework for agent architecture, and local LLM backends (NVIDIA Nemotron Docker + Ollama fallback) to ensure completely free operation. The system will simulate N=100 agents over 20 years (240 monthly steps) to reproduce macro indicators and analyses from the original ACL24-EconAgent paper while adding enterprise-level improvements including robustness, batching, caching, and comprehensive testing. All LLM calls will be local and free to avoid any API costs.
+This document specifies the requirements for reproducing and improving the EconAgent paper system using Mesa for ABM simulation, LightAgent framework for agent architecture, real-time FRED economic data integration, and a modern React/Tailwind CSS web interface. The system integrates local LLM backends (NVIDIA Nemotron + Ollama fallback) with live Federal Reserve Economic Data (FRED) to create an enterprise-level economic simulation platform. The system will simulate N=100 agents calibrated against real economic conditions, provide real-time economic data visualization, and offer an intuitive web-based user interface for researchers and analysts.
 
 ## Glossary
 
-- **EconAgent_System**: The complete economic simulation system integrating Mesa, LightAgent, and local LLM backends
+- **EconAgent_System**: The complete economic simulation system integrating Mesa, LightAgent, FRED data, and React web interface
 - **Mesa_Model**: The Mesa-based agent-based modeling framework managing the economic simulation
 - **LightAgent_Framework**: The lightweight agentic framework (v0.4.0+) providing mem0 memory, Tools integration, and Tree-of-Thoughts (ToT) capabilities
-- **Local_LLM_Client**: The HTTP client interface for communicating with local LLM services (Nemotron Docker + Ollama fallback)
+- **Local_LLM_Client**: The HTTP client interface for communicating with local LLM services (Nemotron + Ollama fallback)
+- **FRED_Integration**: Real-time Federal Reserve Economic Data integration for calibration and validation
+- **React_Interface**: Modern web-based user interface built with React and Tailwind CSS
 - **Economic_Agent**: Individual agents in the simulation with perception, memory, and decision-making capabilities using LightAgent
-- **Simulation_Environment**: The economic environment including government, bank, and goods market
+- **Simulation_Environment**: The economic environment including government, bank, and goods market calibrated with real FRED data
+- **Real_Data_Manager**: System for fetching, processing, and integrating live economic data from FRED API
+- **Web_Dashboard**: Interactive dashboard for simulation control, real-time monitoring, and data visualization
+- **API_Backend**: FastAPI backend providing REST endpoints for the React frontend
+- **Data_Calibration**: System for calibrating simulation parameters using historical FRED data
 - **Prompt_Templates**: Structured templates for agent perception, reflection, and decision-making prompts
 - **DataCollector**: Mesa component for gathering simulation metrics and economic indicators
 - **Batch_Processing**: System for processing multiple LLM requests efficiently using local resources
 - **Memory_System**: Agent memory management using mem0 for storing dialogues and reflections
-- **Docker_Nemotron**: Local NVIDIA Nemotron container running at localhost:8000
-- **Ollama_Fallback**: Local Ollama service as backup LLM at localhost:11434
 
 ## Requirements
 
 ### Requirement 1
 
-**User Story:** As a researcher, I want to reproduce the original EconAgent paper results using completely local and free LLM setup, so that I can validate the methodology without any API costs or external dependencies.
+**User Story:** As a researcher, I want to integrate real-time FRED economic data with the EconAgent simulation, so that I can calibrate models against actual economic conditions and validate results with real-world data.
 
 #### Acceptance Criteria
 
-1. WHEN the system initializes, THE EconAgent_System SHALL clone and integrate the original ACL24-EconAgent codebase
-2. THE Local_LLM_Client SHALL connect to local NVIDIA Nemotron Docker container at http://localhost:8000/v1 using OpenAI-compatible format
-3. WHEN Nemotron is unavailable, THE Local_LLM_Client SHALL fallback to Ollama service at http://localhost:11434/v1
-4. THE EconAgent_System SHALL simulate 100 agents for 240 monthly steps by default with zero API costs
-5. THE DataCollector SHALL reproduce key metrics from the paper including inflation, unemployment, GDP, Phillips curve, and Okun's law
+1. THE FRED_Integration SHALL fetch real-time economic data including GDP, unemployment, inflation, interest rates, and wage data from the Federal Reserve API
+2. THE Data_Calibration SHALL automatically calibrate simulation parameters using historical FRED data trends
+3. THE EconAgent_System SHALL validate simulation outputs against corresponding FRED economic indicators
+4. THE Real_Data_Manager SHALL cache FRED data locally and update automatically with configurable refresh intervals
+5. THE Simulation_Environment SHALL initialize economic conditions based on current FRED data snapshots
 
 ### Requirement 2
 
-**User Story:** As a developer, I want to integrate the production-level LightAgent framework (v0.4.0+) with economic agents, so that agents have enhanced memory, tools, and reasoning capabilities using the actual framework features.
+**User Story:** As a user, I want a modern, intuitive React-based web interface with Tailwind CSS styling, so that I can easily configure simulations, monitor progress, and analyze results through a professional dashboard.
 
 #### Acceptance Criteria
 
-1. THE LightAgent_Framework SHALL use mem0 memory stores for each Economic_Agent with configurable retention
-2. WHEN an agent makes decisions, THE LightAgent_Framework SHALL use Tree-of-Thoughts reasoning with DeepSeek-R1 support if available locally
-3. THE Memory_System SHALL store the last L=1 months of dialogues and quarterly reflections for each agent using mem0
-4. WHEN a quarter ends, THE Economic_Agent SHALL perform reflection using LightAgent's self-learning capabilities
-5. THE LightAgent_Framework SHALL expose economic tools for reading environment indicators including price, unemployment, and tax schedules
+1. THE React_Interface SHALL provide a responsive web dashboard accessible via modern browsers
+2. THE Web_Dashboard SHALL display real-time simulation progress with live economic indicator charts
+3. THE React_Interface SHALL allow configuration of simulation parameters including agent count, time horizon, and economic scenarios
+4. THE Web_Dashboard SHALL integrate FRED data visualization with simulation results for comparison analysis
+5. THE React_Interface SHALL provide export functionality for simulation results in multiple formats (CSV, Excel, JSON)
 
 ### Requirement 3
 
-**User Story:** As a system administrator, I want enterprise-level robustness and performance features using only local resources, so that the system can handle large-scale simulations reliably without external costs.
+**User Story:** As a system administrator, I want enterprise-level architecture with FastAPI backend and production-ready deployment capabilities, so that the system can handle multiple users and large-scale simulations reliably.
 
 #### Acceptance Criteria
 
-1. THE Batch_Processing SHALL group multiple agent prompts into concurrent requests with configurable thread limits for local LLM services
-2. THE EconAgent_System SHALL implement caching for identical prompts to reduce redundant local LLM calls
-3. WHEN local LLM parsing fails, THE Local_LLM_Client SHALL implement automatic retry with fallback values and alternative local models
-4. THE EconAgent_System SHALL validate all LLM outputs using JSON schema with value clamping to valid ranges
-5. THE EconAgent_System SHALL support deterministic seeding for reproducible experiments using local resources only
+1. THE API_Backend SHALL provide RESTful endpoints using FastAPI for simulation management and data access
+2. THE EconAgent_System SHALL support concurrent simulation execution with proper resource isolation
+3. THE API_Backend SHALL implement authentication, rate limiting, and request validation for production use
+4. THE EconAgent_System SHALL provide comprehensive logging, monitoring, and error handling capabilities
+5. THE API_Backend SHALL support WebSocket connections for real-time simulation progress updates
 
 ### Requirement 4
 
-**User Story:** As a researcher, I want comprehensive testing and validation capabilities using mock services, so that I can ensure system correctness and reliability without requiring actual LLM services.
+**User Story:** As a developer, I want to integrate the production-level LightAgent framework with economic agents enhanced by real-time data, so that agents make informed decisions based on current economic conditions.
 
 #### Acceptance Criteria
 
-1. THE EconAgent_System SHALL include unit tests for all major components including Local_LLM_Client, LightAgent_Framework integration, and Mesa_Model
-2. THE EconAgent_System SHALL provide integration tests validating end-to-end simulation workflows with mock LLM responses
-3. THE EconAgent_System SHALL include offline testing capabilities that simulate LLM responses without requiring running Docker containers
-4. THE EconAgent_System SHALL validate that economic metrics remain within expected ranges during test simulations
-5. THE EconAgent_System SHALL provide benchmarking capabilities for performance measurement using local resources
+1. THE LightAgent_Framework SHALL use mem0 memory stores for each Economic_Agent with FRED data integration
+2. THE Economic_Agent SHALL access real-time FRED data through LightAgent tools for informed decision-making
+3. THE Memory_System SHALL store agent interactions, FRED data snapshots, and quarterly reflections using mem0
+4. THE LightAgent_Framework SHALL use Tree-of-Thoughts reasoning incorporating both historical patterns and current FRED indicators
+5. THE Economic_Agent SHALL adapt decision-making strategies based on real economic trend analysis from FRED data
 
 ### Requirement 5
 
-**User Story:** As a user, I want clear setup and execution instructions for local-only deployment, so that I can run the system locally with minimal configuration and zero ongoing costs.
+**User Story:** As a data analyst, I want comprehensive data visualization and analysis tools integrated with the web interface, so that I can explore simulation results and compare them with real economic data.
 
 #### Acceptance Criteria
 
-1. THE EconAgent_System SHALL provide automated scripts for starting local NVIDIA Nemotron Docker container and Ollama service
-2. THE EconAgent_System SHALL include a CLI interface with configurable parameters for agents, years, batch size, and seeding
-3. THE EconAgent_System SHALL provide comprehensive documentation including local setup, Docker configuration, and troubleshooting guides
-4. THE EconAgent_System SHALL validate local service connectivity and provide clear error messages for missing Docker or Ollama dependencies
-5. THE EconAgent_System SHALL support both full simulations and quick debugging runs with reduced parameters using local resources
+1. THE Web_Dashboard SHALL display interactive charts comparing simulation results with FRED economic indicators
+2. THE React_Interface SHALL provide drill-down capabilities for analyzing individual agent behaviors and market dynamics
+3. THE Web_Dashboard SHALL generate automated reports comparing simulation accuracy against historical FRED data
+4. THE React_Interface SHALL support custom chart creation and dashboard configuration for different analysis needs
+5. THE Web_Dashboard SHALL provide real-time streaming of simulation metrics with configurable update intervals
 
 ### Requirement 6
 
-**User Story:** As an economic modeler, I want accurate agent decision-making based on economic context using LightAgent's production features, so that the simulation produces realistic economic behaviors with advanced agent capabilities.
+**User Story:** As a system administrator, I want clean, maintainable code architecture with proper separation of concerns, so that the system is easy to deploy, maintain, and extend.
 
 #### Acceptance Criteria
 
-1. THE Prompt_Templates SHALL implement perception prompts including economic context, personal history, and market conditions using LightAgent's prompt system
-2. THE Economic_Agent SHALL make work propensity decisions as float values in [0,1] with 0.02 step precision using LightAgent decision framework
-3. THE Economic_Agent SHALL make consumption decisions as float values in [0,1] representing fraction of available assets
-4. THE Economic_Agent SHALL consider savings, expected income, prices, interest rates, taxes, and redistribution in decisions using LightAgent tools
-5. THE Economic_Agent SHALL adapt decision-making based on quarterly reflections and learned patterns using LightAgent's self-learning capabilities
+1. THE EconAgent_System SHALL organize code into clear modules with separation between frontend, backend, simulation, and data layers
+2. THE API_Backend SHALL follow RESTful design principles with proper HTTP status codes and error handling
+3. THE React_Interface SHALL use modern React patterns including hooks, context, and component composition
+4. THE EconAgent_System SHALL implement proper configuration management with environment-based settings
+5. THE EconAgent_System SHALL include comprehensive documentation, type hints, and code comments for maintainability
 
 ### Requirement 7
 
-**User Story:** As a simulation operator, I want robust economic environment modeling integrated with LightAgent's tool system, so that the system accurately represents government, banking, and market dynamics with intelligent agent interactions.
+**User Story:** As an economic researcher, I want the simulation to be calibrated and validated against real FRED economic data, so that the model produces realistic and academically rigorous results.
 
 #### Acceptance Criteria
 
-1. THE Simulation_Environment SHALL implement progressive taxation using 2018 U.S. Federal tax brackets accessible via LightAgent tools
-2. THE Simulation_Environment SHALL distribute tax revenue equally across all agents monthly with LightAgent tool integration
-3. THE Simulation_Environment SHALL update wages and prices using equations (7) and (8) from the original paper
-4. THE Simulation_Environment SHALL apply annual interest on savings and update interest rates via Taylor rule
-5. THE Simulation_Environment SHALL maintain inventory tracking for goods production and consumption accessible through LightAgent economic tools
+1. THE Data_Calibration SHALL automatically adjust simulation parameters based on historical FRED economic trends
+2. THE Simulation_Environment SHALL initialize with current economic conditions derived from latest FRED data snapshots
+3. THE EconAgent_System SHALL validate simulation outputs against corresponding FRED indicators with statistical significance testing
+4. THE Real_Data_Manager SHALL provide data quality checks and handle missing or anomalous FRED data gracefully
+5. THE EconAgent_System SHALL generate calibration reports showing parameter adjustments and validation metrics
 
 ### Requirement 8
 
-**User Story:** As a performance engineer, I want optimized local LLM usage and resource management, so that large-scale simulations complete in reasonable time using only local computational resources.
+**User Story:** As a deployment engineer, I want containerized deployment with Docker Compose for easy setup and scaling, so that the system can be deployed consistently across different environments.
 
 #### Acceptance Criteria
 
-1. THE Batch_Processing SHALL support configurable parallel thread limits for concurrent local LLM requests
-2. THE EconAgent_System SHALL implement in-memory caching for identical prompt-response pairs to minimize local LLM calls
-3. THE Local_LLM_Client SHALL support streaming responses when beneficial for performance with local services
-4. THE EconAgent_System SHALL provide graceful degradation when local LLM services are unavailable with conservative fallback decisions
-5. THE EconAgent_System SHALL include profiling capabilities for identifying performance bottlenecks in local LLM processing
+1. THE EconAgent_System SHALL provide Docker Compose configuration for all services including backend, frontend, and databases
+2. THE API_Backend SHALL support horizontal scaling with load balancing and session management
+3. THE EconAgent_System SHALL include health checks and monitoring endpoints for production deployment
+4. THE React_Interface SHALL be optimized for production with proper bundling, caching, and CDN support
+5. THE EconAgent_System SHALL provide environment-specific configuration for development, staging, and production deployments
 
 ### Requirement 9
 
-**User Story:** As a cost-conscious researcher, I want to ensure zero ongoing operational costs, so that I can run extensive experiments without financial constraints.
+**User Story:** As a researcher, I want comprehensive testing and validation capabilities with both unit and integration tests, so that I can ensure system correctness and reliability across all components.
 
 #### Acceptance Criteria
 
-1. THE EconAgent_System SHALL operate entirely with local computational resources without external API calls
-2. THE Local_LLM_Client SHALL never make requests to paid external services or APIs
-3. THE EconAgent_System SHALL provide clear documentation on local resource requirements and setup costs (one-time hardware/software)
-4. THE EconAgent_System SHALL include monitoring to detect and prevent any accidental external API calls
-5. THE EconAgent_System SHALL provide performance estimates for different local hardware configurations to help users plan resources
+1. THE EconAgent_System SHALL include unit tests for all major components including FRED integration, React components, and API endpoints
+2. THE EconAgent_System SHALL provide integration tests validating end-to-end workflows from data fetching to simulation execution
+3. THE React_Interface SHALL include component testing with proper mocking of API calls and user interactions
+4. THE API_Backend SHALL include API testing with proper request/response validation and error handling scenarios
+5. THE EconAgent_System SHALL provide automated testing pipelines with continuous integration and deployment capabilities

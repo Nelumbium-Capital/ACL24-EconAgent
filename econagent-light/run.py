@@ -86,7 +86,8 @@ def run_simulation(
     output_dir: str = "./results",
     save_frequency: int = 6,
     log_frequency: int = 3,
-    config: Optional[SystemConfig] = None
+    config: Optional[SystemConfig] = None,
+    use_real_data: bool = True
 ) -> EconModel:
     """
     Run economic simulation.
@@ -127,9 +128,38 @@ def run_simulation(
     logger.info(f"  Agents: {n_agents}")
     logger.info(f"  Duration: {years} years ({years * 12} months)")
     logger.info(f"  Seed: {seed}")
+    logger.info(f"  Real FRED Data: {use_real_data}")
     logger.info(f"  LightAgent: {enable_lightagent}")
     logger.info(f"  Memory: {enable_memory}")
     logger.info(f"  Tree-of-Thought: {enable_tot}")
+    
+    # Initialize real data if enabled
+    real_data_manager = None
+    calibrated_params = {}
+    
+    if use_real_data:
+        try:
+            from src.data_integration.real_data_manager import RealDataManager
+            
+            logger.info("Initializing real economic data from FRED...")
+            real_data_manager = RealDataManager(
+                fred_api_key=config.fred.api_key,
+                cache_dir=config.fred.cache_dir,
+                auto_update=True
+            )
+            
+            real_data = real_data_manager.initialize_real_data(
+                start_date="2010-01-01",
+                calibration_scenario="post_covid"
+            )
+            
+            calibrated_params = real_data['calibrated_params']
+            logger.info(f"Successfully loaded {len(real_data['data_sources'])} FRED series")
+            
+        except Exception as e:
+            logger.warning(f"Failed to initialize real data: {e}")
+            logger.warning("Falling back to default parameters")
+            use_real_data = False
     
     # Initialize LLM client
     llm_client = None
@@ -160,21 +190,47 @@ def run_simulation(
     # Initialize model
     logger.info("Initializing economic model...")
     
+    # Use real data parameters if available, otherwise use config defaults
+    if use_real_data and calibrated_params:
+        economic_params = {
+            'productivity': calibrated_params.get('productivity', config.economic.productivity),
+            'max_price_inflation': calibrated_params.get('max_price_inflation', config.economic.max_price_inflation),
+            'max_wage_inflation': calibrated_params.get('max_wage_inflation', config.economic.max_wage_inflation),
+            'base_interest_rate': calibrated_params.get('base_interest_rate', config.economic.base_interest_rate),
+            'pareto_param': calibrated_params.get('pareto_param', config.economic.pareto_param),
+            'payment_max_skill_multiplier': calibrated_params.get('payment_max_skill_multiplier', config.economic.payment_max_skill_multiplier),
+        }
+        logger.info("Using FRED-calibrated economic parameters")
+    else:
+        economic_params = {
+            'productivity': config.economic.productivity,
+            'max_price_inflation': config.economic.max_price_inflation,
+            'max_wage_inflation': config.economic.max_wage_inflation,
+            'base_interest_rate': config.economic.base_interest_rate,
+            'pareto_param': config.economic.pareto_param,
+            'payment_max_skill_multiplier': config.economic.payment_max_skill_multiplier,
+        }
+        logger.info("Using default economic parameters")
+    
     model = EconModel(
         n_agents=n_agents,
         episode_length=years * 12,
         random_seed=seed,
-        # Economic parameters
-        productivity=config.economic.productivity,
+        # Economic parameters (real or default)
+        productivity=economic_params['productivity'],
         skill_change=config.economic.skill_change,
         price_change=config.economic.price_change,
-        max_price_inflation=config.economic.max_price_inflation,
-        max_wage_inflation=config.economic.max_wage_inflation,
-        pareto_param=config.economic.pareto_param,
-        payment_max_skill_multiplier=config.economic.payment_max_skill_multiplier,
+        max_price_inflation=economic_params['max_price_inflation'],
+        max_wage_inflation=economic_params['max_wage_inflation'],
+        pareto_param=economic_params['pareto_param'],
+        payment_max_skill_multiplier=economic_params['payment_max_skill_multiplier'],
         labor_hours=config.economic.labor_hours,
         consumption_rate_step=config.economic.consumption_rate_step,
-        base_interest_rate=config.economic.base_interest_rate,
+        base_interest_rate=economic_params['base_interest_rate'],
+        # Real FRED data integration (full ACL24-EconAgent paper implementation)
+        fred_api_key=config.fred.api_key,
+        enable_real_data=use_real_data,
+        real_data_update_frequency=12,  # Update real data annually
         # LLM and LightAgent
         llm_client=llm_client,
         enable_lightagent=enable_lightagent,
@@ -184,6 +240,10 @@ def run_simulation(
         save_frequency=save_frequency,
         log_frequency=log_frequency
     )
+    
+    # Attach real data manager for validation
+    if real_data_manager:
+        model.real_data_manager = real_data_manager
     
     # Run simulation
     logger.info("Starting simulation...")
@@ -212,6 +272,7 @@ def run_simulation(
         with open(summary_file, 'w') as f:
             f.write("EconAgent-Light Simulation Summary\n")
             f.write("=" * 40 + "\n\n")
+            f.write(f"Real FRED Data Used: {use_real_data}\n")
             f.write(f"Simulation Length: {summary['simulation_length']} months\n")
             f.write(f"Final GDP: ${summary['final_gdp']:,.2f}\n")
             f.write(f"Average Unemployment: {summary['avg_unemployment']:.1%}\n")
@@ -223,6 +284,36 @@ def run_simulation(
                 f.write("LLM Statistics:\n")
                 for key, value in summary['llm_stats'].items():
                     f.write(f"  {key}: {value}\n")
+        
+        # Generate real data report if available
+        if real_data_manager:
+            real_data_report = real_data_manager.generate_data_report(
+                os.path.join(output_dir, "real_data_report.txt")
+            )
+            logger.info("Real data integration report saved")
+            
+            # Validate simulation results against real data
+            try:
+                simulation_results = model.get_results_dataframe()
+                validation_scores = real_data_manager.validate_simulation_results(simulation_results)
+                
+                validation_file = os.path.join(output_dir, "validation_scores.txt")
+                with open(validation_file, 'w') as f:
+                    f.write("Simulation Validation Against Real FRED Data\n")
+                    f.write("=" * 50 + "\n\n")
+                    for metric, scores in validation_scores.items():
+                        if isinstance(scores, dict):
+                            f.write(f"{metric.upper()}:\n")
+                            for score_type, value in scores.items():
+                                f.write(f"  {score_type}: {value:.4f}\n")
+                        else:
+                            f.write(f"{metric}: {scores:.4f}\n")
+                        f.write("\n")
+                
+                logger.info("Validation scores saved")
+                
+            except Exception as e:
+                logger.warning(f"Failed to validate simulation results: {e}")
         
         elapsed_time = time.time() - start_time
         logger.info(f"Simulation completed in {elapsed_time:.1f} seconds")
@@ -252,6 +343,10 @@ def main():
                        help="Number of years to simulate")
     parser.add_argument("--seed", type=int, default=None,
                        help="Random seed for reproducibility")
+    
+    # Data parameters
+    parser.add_argument("--no-real-data", action="store_true",
+                       help="Disable real FRED data integration (use default parameters)")
     
     # LightAgent parameters
     parser.add_argument("--no-lightagent", action="store_true",
@@ -348,7 +443,8 @@ def main():
             output_dir=args.output_dir,
             save_frequency=args.save_frequency,
             log_frequency=args.log_frequency,
-            config=config
+            config=config,
+            use_real_data=not args.no_real_data
         )
         
         logger.info("Simulation completed successfully!")

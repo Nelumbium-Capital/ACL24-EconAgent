@@ -6,6 +6,10 @@ Migrates original config.yaml parameters to Python configuration.
 import os
 from dataclasses import dataclass
 from typing import List, Dict, Any, Optional
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 @dataclass
 class EconomicConfig:
@@ -60,16 +64,16 @@ class LLMConfig:
     """LLM service configuration - supports both local and NVIDIA API."""
     
     # NVIDIA API configuration
-    nvidia_api_key: str = "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"
+    nvidia_api_key: str = os.getenv("NGC_API_KEY", "")
     nvidia_base_url: str = "https://integrate.api.nvidia.com/v1"
     nvidia_model: str = "nvidia/nemotron-4-340b-instruct"
     
     # Local Nemotron configuration (fallback)
-    nemotron_base_url: str = "http://localhost:8000/v1"
+    nemotron_base_url: str = os.getenv("NEMOTRON_URL", "http://localhost:8000/v1")
     nemotron_model: str = "nvidia-nemotron-nano-9b-v2"
     
     # Ollama fallback configuration  
-    ollama_base_url: str = "http://localhost:11434/v1"
+    ollama_base_url: str = os.getenv("OLLAMA_URL", "http://localhost:11434/v1")
     ollama_model: str = "llama2:7b-chat"
     
     # Request parameters
@@ -104,27 +108,44 @@ class LightAgentConfig:
     adaptive_tools: bool = True
 
 @dataclass
+class FREDConfig:
+    """FRED API configuration for real economic data."""
+    
+    # FRED API configuration
+    api_key: str = os.getenv("FRED_API_KEY", "")
+    base_url: str = "https://api.stlouisfed.org/fred"
+    cache_dir: str = os.getenv("CACHE_DIR", "./data_cache")
+    cache_hours: int = int(os.getenv("CACHE_HOURS", "24"))
+    
+    # Data fetching parameters
+    default_start_date: str = "2010-01-01"
+    enable_caching: bool = True
+    rate_limit_delay: float = 0.1  # Seconds between requests
+
+@dataclass
 class SystemConfig:
     """Overall system configuration."""
     
     economic: EconomicConfig
     llm: LLMConfig
     lightagent: LightAgentConfig
+    fred: FREDConfig
     
     # Logging and output
-    log_level: str = "INFO"
+    log_level: str = os.getenv("LOG_LEVEL", "INFO")
     output_dir: str = "./results"
     save_frequency: int = 6  # Save every 6 months
     
     # Performance monitoring
-    enable_profiling: bool = False
+    enable_profiling: bool = os.getenv("DEBUG", "false").lower() == "true"
     monitor_resources: bool = True
 
 # Default configuration instance
 DEFAULT_CONFIG = SystemConfig(
     economic=EconomicConfig(),
     llm=LLMConfig(),
-    lightagent=LightAgentConfig()
+    lightagent=LightAgentConfig(),
+    fred=FREDConfig()
 )
 
 # Original tax brackets from simulate_utils.py
