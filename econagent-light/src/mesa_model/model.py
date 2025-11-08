@@ -127,17 +127,31 @@ class EconModel(Model):
         self.real_data_manager = None
         self.last_real_data_update = 0
         
-        # Initialize real economic data if enabled
-        if self.enable_real_data:
-            self._initialize_real_data()
+        # Initialize with FRED data if enabled
+        if self.enable_real_data and self.fred_api_key:
+            from .fred_init import initialize_model_with_fred
+            success = initialize_model_with_fred(self, self.fred_api_key)
+            if not success:
+                self.enable_real_data = False
+        else:
+            logger.info("FRED data integration disabled or no API key provided")
+            # Initialize with defaults
+            avg_skill = self.payment_max_skill_multiplier / 2
+            monthly_production = (self.n_agents * self.labor_hours * avg_skill * 
+                                self.productivity * 0.96)
+            self.goods_inventory = monthly_production * 0.5
+            self.price_history = [self.goods_price]
+            self.wage_history = [self.average_wage]
+            self.interest_rate_history = [self.interest_rate]
         
-        # Economic state variables (initialized from real data if available)
+        # Economic state variables - will be initialized from FRED data if available
+        # Default values (will be overwritten by FRED data)
         self.goods_inventory = 0.0
-        self.goods_price = 1.0  # Will be updated from real CPI data
-        self.average_wage = 1.0  # Will be updated from real wage data
-        self.interest_rate = base_interest_rate  # Will be updated from real Fed funds rate
-        self.inflation_rate = 0.0  # Will be calculated from real CPI data
-        self.unemployment_rate = 0.0  # Will be updated from real unemployment data
+        self.goods_price = 1.0
+        self.average_wage = 1.0
+        self.interest_rate = base_interest_rate
+        self.inflation_rate = 0.02  # 2% target
+        self.unemployment_rate = 0.04  # 4% natural rate
         
         # Real economic indicators from FRED
         self.real_gdp_growth = 0.0
@@ -235,67 +249,44 @@ class EconModel(Model):
             logger.warning("LightAgent integration disabled - using fallback decisions")
     
     def _initialize_real_data(self):
-        """Initialize real economic data from FRED API."""
+        """Initialize real economic data from FRED API - simplified direct approach."""
         try:
-            import sys
-            from pathlib import Path
-            sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-            
-            from src.data_integration.real_data_manager import RealDataManager
-            from config import DEFAULT_CONFIG
-            
-            # Use provided API key or default from config
-            api_key = self.fred_api_key or DEFAULT_CONFIG.fred.api_key
+            from ..data_integration.fred_client import FREDClient
             
             logger.info("Initializing real economic data from FRED...")
-            self.real_data_manager = RealDataManager(
-                fred_api_key=api_key,
-                cache_dir=DEFAULT_CONFIG.fred.cache_dir,
-                auto_update=True
-            )
+            fred_client = FREDClient(api_key=self.fred_api_key)
             
-            # Initialize with real economic data
-            real_data = self.real_data_manager.initialize_real_data(
-                start_date="2015-01-01",
-                calibration_scenario="post_covid"
-            )
+            # Get current economic snapshot
+            snapshot = fred_client.get_current_economic_snapshot()
             
-            # Update model parameters with real data
-            calibrated_params = real_data['calibrated_params']
-            current_indicators = self.real_data_manager.get_real_time_indicators()
+            # Set initial economic conditions from FRED data
+            self.real_unemployment_rate = snapshot.unemployment_rate / 100
+            self.unemployment_rate = self.real_unemployment_rate
+            self.inflation_rate = snapshot.inflation_rate / 100
             
-            # Set initial economic conditions from real data
-            if 'unemployment' in current_indicators:
-                self.real_unemployment_rate = current_indicators['unemployment']['value'] / 100
-                self.unemployment_rate = self.real_unemployment_rate
+            self.real_fed_funds_rate = snapshot.fed_funds_rate / 100
+            self.interest_rate = self.real_fed_funds_rate
+            self.base_interest_rate = self.real_fed_funds_rate
             
-            if 'fed_funds' in current_indicators:
-                self.real_fed_funds_rate = current_indicators['fed_funds']['value'] / 100
-                self.interest_rate = self.real_fed_funds_rate
-                self.base_interest_rate = self.real_fed_funds_rate
+            # Set reasonable price and wage levels
+            # Keep them at 1.0 for simulation but track real values
+            self.goods_price = 1.0
+            self.average_wage = 1.0
             
-            if 'cpi' in current_indicators:
-                self.real_cpi_level = current_indicators['cpi']['value']
-                # Normalize CPI to simulation scale
-                self.goods_price = self.real_cpi_level / 100.0
+            # Store FRED data for reference
+            self.real_cpi_level = 100.0  # Normalized
+            self.real_wage_growth = snapshot.wage_growth / 100
+            self.real_gdp_growth = snapshot.gdp_growth / 100
             
-            if 'wages' in current_indicators:
-                real_wage = current_indicators['wages']['value']
-                # Normalize wage to simulation scale
-                self.average_wage = real_wage / 30.0  # Approximate normalization
+            # Adjust model parameters to match FRED conditions
+            # Reduce volatility to match real economy
+            self.max_price_inflation = 0.03  # 3% max (more realistic)
+            self.max_wage_inflation = 0.02   # 2% max (more realistic)
             
-            # Update calibrated parameters
-            if 'productivity' in calibrated_params:
-                self.productivity = calibrated_params['productivity']
-            
-            if 'max_price_inflation' in calibrated_params:
-                self.max_price_inflation = calibrated_params['max_price_inflation']
-            
-            if 'max_wage_inflation' in calibrated_params:
-                self.max_wage_inflation = calibrated_params['max_wage_inflation']
-            
-            logger.info(f"Real data initialized: Unemployment={self.unemployment_rate:.1%}, "
-                       f"Fed Funds={self.interest_rate:.1%}, CPI={self.real_cpi_level:.1f}")
+            logger.info(f"✅ FRED data initialized successfully:")
+            logger.info(f"   Unemployment: {self.unemployment_rate*100:.1f}%")
+            logger.info(f"   Inflation: {self.inflation_rate*100:.1f}%")
+            logger.info(f"   Interest Rate: {self.interest_rate*100:.1f}%")
             
         except Exception as e:
             logger.warning(f"Failed to initialize real data: {e}")
@@ -482,6 +473,11 @@ class EconModel(Model):
         employment_rate = len(employed_agents) / self.n_agents
         self.unemployment_rate = 1.0 - employment_rate
         
+        # Calculate reasonable target inventory based on production capacity
+        # Target = average monthly production (agents * hours * skill * productivity)
+        avg_skill = sum(a.skill for a in self.schedule.agents) / self.n_agents
+        target_inventory = self.n_agents * self.labor_hours * avg_skill * self.productivity * 0.5  # 50% of max production
+        
         # Update wages and prices using original logic
         new_wage, new_price = update_wages_and_prices(
             current_wage=self.average_wage,
@@ -490,8 +486,10 @@ class EconModel(Model):
             inventory_level=self.goods_inventory,
             max_wage_inflation=self.max_wage_inflation,
             max_price_inflation=self.max_price_inflation,
-            wage_adjustment_rate=0.05,  # alpha_w from original
-            price_adjustment_rate=0.10   # alpha_P from original
+            wage_adjustment_rate=0.02,  # Reduced from 0.05 for stability
+            price_adjustment_rate=0.03,  # Reduced from 0.10 for stability
+            target_employment=0.96,  # 4% natural unemployment
+            target_inventory=target_inventory
         )
         
         # Calculate inflation

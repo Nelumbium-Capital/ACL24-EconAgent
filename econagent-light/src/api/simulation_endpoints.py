@@ -15,11 +15,22 @@ import uuid
 
 from ..data_integration.fred_client import FREDClient
 from ..data_integration.calibration_engine import CalibrationEngine
+from dotenv import load_dotenv
+import os
+
+# Load environment variables
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
-# Initialize clients
-fred_client = FREDClient()
+# Initialize clients with API key from environment
+fred_api_key = os.getenv("FRED_API_KEY")
+if fred_api_key:
+    logger.info(f"FRED API key loaded for simulations: {fred_api_key[:8]}...")
+else:
+    logger.warning("No FRED API key found for simulations")
+
+fred_client = FREDClient(api_key=fred_api_key)
 calibration_engine = CalibrationEngine(fred_client)
 
 # Create router
@@ -292,59 +303,98 @@ async def export_simulation_results(
 
 # Background task for running simulations
 async def run_simulation_task(simulation_id: str):
-    """Background task to run a simulation."""
+    """Background task to run a simulation using the actual Mesa EconModel."""
     try:
         simulation_data = simulation_store[simulation_id]
         config = SimulationConfig(**simulation_data["config"])
         
-        logger.info(f"Running simulation {simulation_id}: {config.name}")
+        logger.info(f"Running REAL Mesa simulation {simulation_id}: {config.name}")
         
         # Get FRED calibration if requested
         calibration_result = None
+        fred_api_key = os.getenv("FRED_API_KEY")
+        
         if config.use_fred_calibration:
             try:
                 calibration_result = calibration_engine.calibrate_simulation_parameters()
-                logger.info(f"Calibration completed for {simulation_id}")
+                logger.info(f"Calibration completed for {simulation_id}: unemployment_target={calibration_result.unemployment_target:.2f}%, inflation_target={calibration_result.inflation_target:.2f}%")
             except Exception as e:
                 logger.warning(f"Calibration failed for {simulation_id}: {e}")
         
-        # Simulate the simulation (mock implementation)
+        # Import and create the actual Mesa EconModel
+        from ..mesa_model.model import EconModel
+        
+        # Create model with configuration
+        model_params = {
+            'n_agents': config.num_agents,
+            'episode_length': config.num_years * 12,
+            'random_seed': config.random_seed,
+            'productivity': config.productivity or 1.0,
+            'skill_change': config.skill_change or 0.02,
+            'price_change': config.price_change or 0.02,
+            'fred_api_key': fred_api_key,
+            'enable_real_data': config.use_fred_calibration,
+            'real_data_update_frequency': 12,  # Update from FRED every 12 months
+            'save_frequency': 6,
+            'log_frequency': 3
+        }
+        
+        # Apply calibration results if available
+        if calibration_result:
+            model_params['base_interest_rate'] = calibration_result.natural_interest_rate
+            # Calibration provides targets that influence the model
+            logger.info(f"Using calibrated parameters: interest_rate={calibration_result.natural_interest_rate:.3f}")
+        
+        logger.info(f"Creating Mesa EconModel with {config.num_agents} agents for {config.num_years} years")
+        model = EconModel(**model_params)
+        
         total_steps = config.num_years * 12
         
-        # Mock economic indicators
-        unemployment_rates = []
-        inflation_rates = []
-        gdp_growth = []
-        
+        # Run the actual Mesa simulation
         for step in range(total_steps):
+            # Run one step of the Mesa model
+            model.step()
+            
             # Update progress
             simulation_data["current_step"] = step + 1
             simulation_data["progress_percent"] = ((step + 1) / total_steps) * 100
             
-            # Mock economic calculations
-            base_unemployment = calibration_result.unemployment_target if calibration_result else 5.0
-            base_inflation = calibration_result.inflation_target if calibration_result else 2.0
-            
-            # Add some random variation
-            import random
-            unemployment = base_unemployment + random.uniform(-1.0, 1.0)
-            inflation = base_inflation + random.uniform(-0.5, 0.5)
-            gdp = 2.5 + random.uniform(-1.0, 1.0)
-            
-            unemployment_rates.append(max(0, unemployment))
-            inflation_rates.append(inflation)
-            gdp_growth.append(gdp)
-            
-            # Update current metrics
+            # Get current metrics from the model
             simulation_data["current_metrics"] = {
-                "unemployment_rate": unemployment,
-                "inflation_rate": inflation,
-                "gdp_growth": gdp,
+                "unemployment_rate": model.unemployment_rate * 100,  # Convert to percentage
+                "inflation_rate": model.inflation_rate * 100,
+                "gdp_growth": (model._calculate_gdp() / max(model._calculate_gdp() - 100, 1)) * 100 if step > 0 else 2.5,
                 "step": step + 1
             }
             
-            # Simulate processing time
-            await asyncio.sleep(0.1)  # 100ms per step for demo
+            # Log progress periodically
+            if (step + 1) % 12 == 0:  # Every year
+                year = (step + 1) // 12
+                logger.info(f"Simulation {simulation_id} - Year {year}: "
+                          f"Unemployment={model.unemployment_rate*100:.1f}%, "
+                          f"Inflation={model.inflation_rate*100:.1f}%, "
+                          f"GDP=${model._calculate_gdp():.0f}")
+            
+            # Small delay to prevent blocking
+            if step % 10 == 0:
+                await asyncio.sleep(0.01)
+        
+        # Get final results from the model
+        model_data = model.get_results_dataframe()
+        
+        # Extract economic indicators
+        unemployment_rates = (model_data['Unemployment'] * 100).tolist()
+        inflation_rates = (model_data['Inflation'] * 100).tolist()
+        
+        # Calculate GDP growth rates
+        gdp_values = model_data['GDP'].tolist()
+        gdp_growth = [2.5]  # Initial value
+        for i in range(1, len(gdp_values)):
+            if gdp_values[i-1] > 0:
+                growth = ((gdp_values[i] - gdp_values[i-1]) / gdp_values[i-1]) * 100
+                gdp_growth.append(growth)
+            else:
+                gdp_growth.append(0.0)
         
         # Simulation completed
         simulation_data["status"] = "completed"
@@ -357,7 +407,9 @@ async def run_simulation_task(simulation_id: str):
                 "avg_unemployment": sum(unemployment_rates) / len(unemployment_rates),
                 "avg_inflation": sum(inflation_rates) / len(inflation_rates),
                 "avg_gdp_growth": sum(gdp_growth) / len(gdp_growth),
-                "total_steps": total_steps
+                "total_steps": total_steps,
+                "final_gini": model._calculate_gini(),
+                "final_total_wealth": model._calculate_total_wealth()
             },
             "economic_indicators": {
                 "unemployment_rates": unemployment_rates,
@@ -366,11 +418,15 @@ async def run_simulation_task(simulation_id: str):
             },
             "agent_statistics": {
                 "num_agents": config.num_agents,
-                "simulation_years": config.num_years
+                "simulation_years": config.num_years,
+                "final_employment_rate": model._calculate_employment_rate(),
+                "average_consumption": model._calculate_average_consumption()
             }
         }
         
-        logger.info(f"Simulation {simulation_id} completed successfully")
+        logger.info(f"Mesa simulation {simulation_id} completed successfully: "
+                   f"Avg Unemployment={simulation_results[simulation_id]['final_metrics']['avg_unemployment']:.1f}%, "
+                   f"Avg Inflation={simulation_results[simulation_id]['final_metrics']['avg_inflation']:.1f}%")
         
     except Exception as e:
         # Simulation failed
@@ -378,4 +434,4 @@ async def run_simulation_task(simulation_id: str):
         simulation_data["error_message"] = str(e)
         simulation_data["completed_at"] = datetime.now().isoformat()
         
-        logger.error(f"Simulation {simulation_id} failed: {e}")
+        logger.error(f"Simulation {simulation_id} failed: {e}", exc_info=True)

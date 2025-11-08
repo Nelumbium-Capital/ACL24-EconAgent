@@ -110,10 +110,16 @@ async def startup_event():
     # Initialize FRED client connection
     try:
         from ..data_integration.fred_client import FREDClient
-        fred_client = FREDClient()
-        # Test connection
-        fred_client._validate_connection()
-        logger.info("FRED API connection validated")
+        import os
+        fred_api_key = os.getenv("FRED_API_KEY")
+        if fred_api_key:
+            logger.info(f"FRED API key found: {fred_api_key[:8]}...")
+            fred_client = FREDClient(api_key=fred_api_key)
+            # Test connection
+            fred_client._validate_connection()
+            logger.info("FRED API connection validated successfully")
+        else:
+            logger.error("No FRED API key found in environment!")
     except Exception as e:
         logger.warning(f"FRED API connection failed: {e}")
     

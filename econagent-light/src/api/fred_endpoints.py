@@ -28,8 +28,19 @@ load_dotenv()
 
 from config import DEFAULT_CONFIG
 
+# Ensure API key is loaded
+fred_api_key = os.getenv("FRED_API_KEY")
+if not fred_api_key:
+    logger.warning("FRED_API_KEY not found in environment, checking config...")
+    fred_api_key = DEFAULT_CONFIG.fred.api_key
+
+if fred_api_key:
+    logger.info(f"FRED API key loaded: {fred_api_key[:8]}...")
+else:
+    logger.error("No FRED API key found! Please set FRED_API_KEY in .env file")
+
 fred_client = FREDClient(
-    api_key=os.getenv("FRED_API_KEY") or DEFAULT_CONFIG.fred.api_key,
+    api_key=fred_api_key,
     cache_dir=DEFAULT_CONFIG.fred.cache_dir,
     cache_hours=DEFAULT_CONFIG.fred.cache_hours
 )
