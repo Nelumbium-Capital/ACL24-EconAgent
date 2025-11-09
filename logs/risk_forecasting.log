@@ -1,0 +1,929 @@
+2025-11-08 22:03:09 - risk_forecasting - INFO - main:18 - ============================================================
+2025-11-08 22:03:09 - risk_forecasting - INFO - main:19 - Testing US Risk Forecasting Data Pipeline
+2025-11-08 22:03:09 - risk_forecasting - INFO - main:20 - ============================================================
+2025-11-08 22:03:09 - risk_forecasting - INFO - __init__:51 - FRED Client initialized with cache dir: data/cache
+2025-11-08 22:03:09 - risk_forecasting - INFO - __init__:130 - DataPipeline initialized with output dir: data/processed
+2025-11-08 22:03:09 - risk_forecasting - INFO - __init__:37 - MissingValueHandler initialized with method: ffill
+2025-11-08 22:03:09 - risk_forecasting - INFO - __init__:81 - FrequencyAligner initialized with frequency: M
+2025-11-08 22:03:09 - risk_forecasting - INFO - main:64 - 
+Processing economic indicators...
+2025-11-08 22:03:09 - risk_forecasting - INFO - process:152 - Processing 4 series through pipeline
+2025-11-08 22:03:09 - risk_forecasting - INFO - _fetch_series:183 - Fetching series from FRED
+2025-11-08 22:03:09 - risk_forecasting - INFO - fetch_multiple_series:253 - Fetching 4 series concurrently
+2025-11-08 22:03:09 - risk_forecasting - INFO - fetch_series:184 - Fetching UNRATE from FRED API (2020-01-01 to 2024-01-01)
+2025-11-08 22:03:09 - risk_forecasting - INFO - fetch_series:184 - Fetching FEDFUNDS from FRED API (2020-01-01 to 2024-01-01)
+2025-11-08 22:03:09 - risk_forecasting - INFO - fetch_series:184 - Fetching CPIAUCSL from FRED API (2020-01-01 to 2024-01-01)
+2025-11-08 22:03:09 - risk_forecasting - INFO - fetch_series:184 - Fetching GDP from FRED API (2020-01-01 to 2024-01-01)
+2025-11-08 22:03:09 - risk_forecasting - INFO - fetch_series:217 - Successfully fetched GDP (17 observations)
+2025-11-08 22:03:09 - risk_forecasting - INFO - fetch_series:217 - Successfully fetched UNRATE (49 observations)
+2025-11-08 22:03:09 - risk_forecasting - INFO - fetch_series:217 - Successfully fetched FEDFUNDS (49 observations)
+2025-11-08 22:03:09 - risk_forecasting - INFO - fetch_series:217 - Successfully fetched CPIAUCSL (49 observations)
+2025-11-08 22:03:09 - risk_forecasting - INFO - fetch_multiple_series:279 - Successfully fetched 4/4 series
+2025-11-08 22:03:09 - risk_forecasting - INFO - transform:60 - inflation: Handled 1 missing values (1 remaining)
+2025-11-08 22:03:09 - risk_forecasting - INFO - _align_and_merge:248 - Common date range: 2020-01-31 00:00:00 to 2024-01-31 00:00:00
+2025-11-08 22:03:09 - risk_forecasting - INFO - _save_versioned_dataset:322 - Saved versioned dataset: 20251108_220309
+2025-11-08 22:03:09 - risk_forecasting - INFO - process:171 - Pipeline complete: 49 observations, 4 series
+2025-11-08 22:03:09 - risk_forecasting - INFO - main:68 - 
+============================================================
+2025-11-08 22:03:09 - risk_forecasting - INFO - main:69 - RESULTS
+2025-11-08 22:03:09 - risk_forecasting - INFO - main:70 - ============================================================
+2025-11-08 22:03:09 - risk_forecasting - INFO - main:71 - 
+Dataset shape: (49, 4)
+2025-11-08 22:03:09 - risk_forecasting - INFO - main:72 - Date range: 2020-01-31 00:00:00 to 2024-01-31 00:00:00
+2025-11-08 22:03:09 - risk_forecasting - INFO - main:73 - 
+Columns: ['unemployment', 'inflation', 'interest_rate', 'gdp']
+2025-11-08 22:03:09 - risk_forecasting - INFO - main:74 - 
+First 5 rows:
+            unemployment  inflation  interest_rate        gdp
+date                                                         
+2020-01-31           3.6        NaN           1.55  21751.238
+2020-02-29           3.5   0.000475           1.58        NaN
+2020-03-31           4.4  -0.004528           0.65        NaN
+2020-04-30          14.8  -0.007920           0.05  19958.291
+2020-05-31          13.2  -0.000898           0.05        NaN
+2025-11-08 22:03:09 - risk_forecasting - INFO - main:75 - 
+Last 5 rows:
+            unemployment  inflation  interest_rate        gdp
+date                                                         
+2023-09-30           3.8   0.004037           5.33        NaN
+2023-10-31           3.9   0.000908           5.33  28424.722
+2023-11-30           3.7   0.001411           5.33        NaN
+2023-12-31           3.8   0.002103           5.33        NaN
+2024-01-31           3.7   0.003430           5.33  28708.161
+2025-11-08 22:03:09 - risk_forecasting - INFO - main:76 - 
+Summary statistics:
+       unemployment  inflation  interest_rate           gdp
+count     49.000000  48.000000      49.000000     17.000000
+mean       5.153061   0.003734       1.863061  24975.082000
+std        2.561258   0.003638       2.168207   2694.994574
+min        3.400000  -0.007920       0.050000  19958.291000
+25%        3.600000   0.001651       0.080000  22680.693000
+50%        3.800000   0.003805       0.330000  25250.347000
+75%        6.100000   0.005321       4.330000  27216.445000
+max       14.800000   0.012952       5.330000  28708.161000
+2025-11-08 22:03:09 - risk_forecasting - INFO - main:77 - 
+Missing values:
+unemployment      0
+inflation         1
+interest_rate     0
+gdp              32
+dtype: int64
+2025-11-08 22:03:09 - risk_forecasting - INFO - main:79 - 
+============================================================
+2025-11-08 22:03:09 - risk_forecasting - INFO - main:80 - ✓ Data pipeline test completed successfully!
+2025-11-08 22:03:09 - risk_forecasting - INFO - main:81 - ============================================================
+2025-11-08 22:17:00 - risk_forecasting - INFO - print_section:23 - 
+======================================================================
+2025-11-08 22:17:00 - risk_forecasting - INFO - print_section:24 -   US FINANCIAL RISK FORECASTING SYSTEM - MVP
+2025-11-08 22:17:00 - risk_forecasting - INFO - print_section:25 - ======================================================================
+2025-11-08 22:17:00 - risk_forecasting - INFO - print_section:23 - 
+======================================================================
+2025-11-08 22:17:00 - risk_forecasting - INFO - print_section:24 -   STEP 1: Data Acquisition from FRED
+2025-11-08 22:17:00 - risk_forecasting - INFO - print_section:25 - ======================================================================
+2025-11-08 22:17:00 - risk_forecasting - INFO - __init__:51 - FRED Client initialized with cache dir: data/cache
+2025-11-08 22:17:00 - risk_forecasting - INFO - __init__:130 - DataPipeline initialized with output dir: data/processed
+2025-11-08 22:17:00 - risk_forecasting - INFO - __init__:37 - MissingValueHandler initialized with method: ffill
+2025-11-08 22:17:00 - risk_forecasting - INFO - __init__:81 - FrequencyAligner initialized with frequency: M
+2025-11-08 22:17:00 - risk_forecasting - INFO - process:152 - Processing 4 series through pipeline
+2025-11-08 22:17:00 - risk_forecasting - INFO - _fetch_series:183 - Fetching series from FRED
+2025-11-08 22:17:00 - risk_forecasting - INFO - fetch_multiple_series:253 - Fetching 4 series concurrently
+2025-11-08 22:17:00 - risk_forecasting - INFO - fetch_series:184 - Fetching UNRATE from FRED API (2018-01-01 to 2024-01-01)
+2025-11-08 22:17:00 - risk_forecasting - INFO - fetch_series:184 - Fetching CPIAUCSL from FRED API (2018-01-01 to 2024-01-01)
+2025-11-08 22:17:00 - risk_forecasting - INFO - fetch_series:184 - Fetching FEDFUNDS from FRED API (2018-01-01 to 2024-01-01)
+2025-11-08 22:17:00 - risk_forecasting - INFO - fetch_series:184 - Fetching BAA10Y from FRED API (2018-01-01 to 2024-01-01)
+2025-11-08 22:17:01 - risk_forecasting - INFO - fetch_series:217 - Successfully fetched CPIAUCSL (73 observations)
+2025-11-08 22:17:01 - risk_forecasting - INFO - fetch_series:217 - Successfully fetched FEDFUNDS (73 observations)
+2025-11-08 22:17:01 - risk_forecasting - INFO - fetch_series:217 - Successfully fetched BAA10Y (1566 observations)
+2025-11-08 22:17:01 - risk_forecasting - INFO - fetch_series:217 - Successfully fetched UNRATE (73 observations)
+2025-11-08 22:17:01 - risk_forecasting - INFO - fetch_multiple_series:279 - Successfully fetched 4/4 series
+2025-11-08 22:17:01 - risk_forecasting - INFO - transform:60 - inflation: Handled 1 missing values (1 remaining)
+2025-11-08 22:17:01 - risk_forecasting - INFO - transform:60 - credit_spread: Handled 69 missing values (1 remaining)
+2025-11-08 22:17:01 - risk_forecasting - INFO - _align_and_merge:248 - Common date range: 2018-01-31 00:00:00 to 2024-01-31 00:00:00
+2025-11-08 22:17:01 - risk_forecasting - INFO - _save_versioned_dataset:322 - Saved versioned dataset: 20251108_221701
+2025-11-08 22:17:01 - risk_forecasting - INFO - process:171 - Pipeline complete: 73 observations, 4 series
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:80 - 
+✓ Fetched 73 observations
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:81 -   Date range: 2018-01-31 to 2024-01-31
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:82 -   Indicators: ['unemployment', 'inflation', 'interest_rate', 'credit_spread']
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:83 - 
+Latest values:
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:85 -   unemployment: 3.7000
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:85 -   inflation: 0.0034
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:85 -   interest_rate: 5.3300
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:85 -   credit_spread: 1.6100
+2025-11-08 22:17:01 - risk_forecasting - INFO - print_section:23 - 
+======================================================================
+2025-11-08 22:17:01 - risk_forecasting - INFO - print_section:24 -   STEP 2: Generate Economic Forecasts
+2025-11-08 22:17:01 - risk_forecasting - INFO - print_section:25 - ======================================================================
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:96 - 
+Generating 6-month forecasts...
+2025-11-08 22:17:01 - risk_forecasting - INFO - __init__:38 - Initialized NemotronTimeSeriesForecaster with model: nvidia/llama-3.1-nemotron-70b-instruct
+2025-11-08 22:17:01 - risk_forecasting - INFO - __init__:283 - Initialized LLM Ensemble Forecaster
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:104 - 
+Forecasting unemployment...
+2025-11-08 22:17:01 - risk_forecasting - INFO - forecast:184 - Generating LLM forecast for unemployment, horizon=6
+2025-11-08 22:17:01 - risk_forecasting - WARNING - _call_llm:74 - Nemotron returned status 500
+2025-11-08 22:17:01 - risk_forecasting - INFO - _call_llm:82 - Falling back to Ollama
+2025-11-08 22:17:01 - risk_forecasting - ERROR - _call_llm:99 - Ollama fallback failed: HTTPConnectionPool(host='localhost', port=11434): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x11a577c50>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-11-08 22:17:01 - risk_forecasting - ERROR - forecast:225 - Failed to parse LLM response: Both Nemotron and Ollama failed
+2025-11-08 22:17:01 - risk_forecasting - WARNING - forecast:227 - Using naive forecast as fallback
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:117 -   LLM reasoning: Fallback: naive forecast (last value repeated)...
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:104 - 
+Forecasting inflation...
+2025-11-08 22:17:01 - risk_forecasting - INFO - forecast:184 - Generating LLM forecast for inflation, horizon=6
+2025-11-08 22:17:01 - risk_forecasting - WARNING - _call_llm:74 - Nemotron returned status 500
+2025-11-08 22:17:01 - risk_forecasting - INFO - _call_llm:82 - Falling back to Ollama
+2025-11-08 22:17:01 - risk_forecasting - ERROR - _call_llm:99 - Ollama fallback failed: HTTPConnectionPool(host='localhost', port=11434): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x11ac0d940>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-11-08 22:17:01 - risk_forecasting - ERROR - forecast:225 - Failed to parse LLM response: Both Nemotron and Ollama failed
+2025-11-08 22:17:01 - risk_forecasting - WARNING - forecast:227 - Using naive forecast as fallback
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:117 -   LLM reasoning: Fallback: naive forecast (last value repeated)...
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:104 - 
+Forecasting interest_rate...
+2025-11-08 22:17:01 - risk_forecasting - INFO - forecast:184 - Generating LLM forecast for interest_rate, horizon=6
+2025-11-08 22:17:01 - risk_forecasting - WARNING - _call_llm:74 - Nemotron returned status 500
+2025-11-08 22:17:01 - risk_forecasting - INFO - _call_llm:82 - Falling back to Ollama
+2025-11-08 22:17:01 - risk_forecasting - ERROR - _call_llm:99 - Ollama fallback failed: HTTPConnectionPool(host='localhost', port=11434): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x11a5fef90>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-11-08 22:17:01 - risk_forecasting - ERROR - forecast:225 - Failed to parse LLM response: Both Nemotron and Ollama failed
+2025-11-08 22:17:01 - risk_forecasting - WARNING - forecast:227 - Using naive forecast as fallback
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:117 -   LLM reasoning: Fallback: naive forecast (last value repeated)...
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:104 - 
+Forecasting credit_spread...
+2025-11-08 22:17:01 - risk_forecasting - INFO - forecast:184 - Generating LLM forecast for credit_spread, horizon=6
+2025-11-08 22:17:01 - risk_forecasting - WARNING - _call_llm:74 - Nemotron returned status 500
+2025-11-08 22:17:01 - risk_forecasting - INFO - _call_llm:82 - Falling back to Ollama
+2025-11-08 22:17:01 - risk_forecasting - ERROR - _call_llm:99 - Ollama fallback failed: HTTPConnectionPool(host='localhost', port=11434): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x11ac88380>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-11-08 22:17:01 - risk_forecasting - ERROR - forecast:225 - Failed to parse LLM response: Both Nemotron and Ollama failed
+2025-11-08 22:17:01 - risk_forecasting - WARNING - forecast:227 - Using naive forecast as fallback
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:117 -   LLM reasoning: Fallback: naive forecast (last value repeated)...
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:136 - 
+✓ Generated forecasts for 4 indicators
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:137 - 
+Forecast summary:
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:138 -             unemployment  inflation  interest_rate  credit_spread
+2024-02-29      3.666667   0.003872           5.33       1.605556
+2024-03-31      3.633333   0.004315           5.33       1.601111
+2024-04-30      3.600000   0.004757           5.33       1.596667
+2024-05-31      3.566667   0.005199           5.33       1.592222
+2024-06-30      3.533333   0.005641           5.33       1.587778
+2024-07-31      3.500000   0.006084           5.33       1.583333
+2025-11-08 22:17:01 - risk_forecasting - INFO - print_section:23 - 
+======================================================================
+2025-11-08 22:17:01 - risk_forecasting - INFO - print_section:24 -   STEP 3: Compute Key Risk Indicators
+2025-11-08 22:17:01 - risk_forecasting - INFO - print_section:25 - ======================================================================
+2025-11-08 22:17:01 - risk_forecasting - INFO - __init__:20 - KRI Calculator initialized
+2025-11-08 22:17:01 - risk_forecasting - INFO - compute_credit_kris:66 - Computed 4 credit KRIs
+2025-11-08 22:17:01 - risk_forecasting - INFO - compute_market_kris:116 - Computed 3 market KRIs
+2025-11-08 22:17:01 - risk_forecasting - INFO - compute_liquidity_kris:154 - Computed 2 liquidity KRIs
+2025-11-08 22:17:01 - risk_forecasting - INFO - compute_all_kris:176 - Computed total of 9 KRIs
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:158 - 
+✓ Computed 9 KRIs
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:159 - 
+KRI Values:
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:163 -   loan_default_rate: 0.02 %
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:163 -   delinquency_rate: 2.70 %
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:163 -   credit_quality_score: 750.00 score
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:163 -   loan_concentration: 25.00 %
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:163 -   portfolio_volatility: 1.44 %
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:163 -   var_95: 2.50 %
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:163 -   interest_rate_risk: 0.50 years
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:163 -   liquidity_coverage_ratio: 1.30 ratio
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:163 -   deposit_flow_ratio: -2.00 %
+2025-11-08 22:17:01 - risk_forecasting - INFO - print_section:23 - 
+======================================================================
+2025-11-08 22:17:01 - risk_forecasting - INFO - print_section:24 -   STEP 4: Risk Assessment & Threshold Evaluation
+2025-11-08 22:17:01 - risk_forecasting - INFO - print_section:25 - ======================================================================
+2025-11-08 22:17:01 - risk_forecasting - INFO - evaluate_thresholds:233 - Risk levels: {'low': 5, 'medium': 3, 'high': 0, 'critical': 1}
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:173 - 
+Risk Level Assessment:
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:181 -   [LOW     ] loan_default_rate: 0.02 %
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:181 -   [LOW     ] delinquency_rate: 2.70 %
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:181 -   [LOW     ] credit_quality_score: 750.00 score
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:181 -   [MEDIUM  ] loan_concentration: 25.00 %
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:181 -   [LOW     ] portfolio_volatility: 1.44 %
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:181 -   [MEDIUM  ] var_95: 2.50 %
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:181 -   [LOW     ] interest_rate_risk: 0.50 years
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:181 -   [MEDIUM  ] liquidity_coverage_ratio: 1.30 ratio
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:181 -   [CRITICAL] deposit_flow_ratio: -2.00 %
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:188 - 
+Risk Summary:
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:190 -   CRITICAL: 1 KRIs
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:190 -   LOW: 5 KRIs
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:190 -   MEDIUM: 3 KRIs
+2025-11-08 22:17:01 - risk_forecasting - INFO - print_section:23 - 
+======================================================================
+2025-11-08 22:17:01 - risk_forecasting - INFO - print_section:24 -   STEP 5: Risk Report Summary
+2025-11-08 22:17:01 - risk_forecasting - INFO - print_section:25 - ======================================================================
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:202 - 
+⚠️  ATTENTION REQUIRED:
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:208 - 
+  • DEPOSIT_FLOW_RATIO
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:209 -     Current Value: -2.00 %
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:210 -     Risk Level: CRITICAL
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:211 -     Category: liquidity
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:212 -     Description: Net deposit inflows/outflows as % of total deposits
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:217 - 
+Key Insights:
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:218 -   • Latest unemployment: 3.7%
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:219 -   • Forecast unemployment (6mo): 3.5%
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:220 -   • Interest rate: 5.33%
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:221 -   • Credit spread: 1.61%
+2025-11-08 22:17:01 - risk_forecasting - INFO - print_section:23 - 
+======================================================================
+2025-11-08 22:17:01 - risk_forecasting - INFO - print_section:24 -   ✓ RISK FORECASTING COMPLETE
+2025-11-08 22:17:01 - risk_forecasting - INFO - print_section:25 - ======================================================================
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:228 - 
+System Components Demonstrated:
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:229 -   ✓ FRED data acquisition with caching
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:230 -   ✓ Data pipeline with ETL transformations
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:231 -   ✓ LLM-based forecasting with Nemotron
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:232 -   ✓ KRI calculation across risk categories
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:233 -   ✓ Risk threshold evaluation
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:234 -   ✓ Automated risk reporting
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:236 - 
+Data saved to:
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:237 -   • Cache: data/cache/
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:238 -   • Processed: data/processed/
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:239 -   • Logs: logs/risk_forecasting.log
+2025-11-08 22:17:01 - risk_forecasting - INFO - main:241 - 
+======================================================================
+2025-11-08 22:35:45 - risk_forecasting - INFO - print_section:23 - 
+======================================================================
+2025-11-08 22:35:45 - risk_forecasting - INFO - print_section:24 -   US FINANCIAL RISK FORECASTING SYSTEM - MVP
+2025-11-08 22:35:45 - risk_forecasting - INFO - print_section:25 - ======================================================================
+2025-11-08 22:35:45 - risk_forecasting - INFO - print_section:23 - 
+======================================================================
+2025-11-08 22:35:45 - risk_forecasting - INFO - print_section:24 -   STEP 1: Data Acquisition from FRED
+2025-11-08 22:35:45 - risk_forecasting - INFO - print_section:25 - ======================================================================
+2025-11-08 22:35:45 - risk_forecasting - INFO - __init__:51 - FRED Client initialized with cache dir: data/cache
+2025-11-08 22:35:45 - risk_forecasting - INFO - __init__:130 - DataPipeline initialized with output dir: data/processed
+2025-11-08 22:35:45 - risk_forecasting - INFO - __init__:37 - MissingValueHandler initialized with method: ffill
+2025-11-08 22:35:45 - risk_forecasting - INFO - __init__:81 - FrequencyAligner initialized with frequency: M
+2025-11-08 22:35:45 - risk_forecasting - INFO - process:152 - Processing 4 series through pipeline
+2025-11-08 22:35:45 - risk_forecasting - INFO - _fetch_series:183 - Fetching series from FRED
+2025-11-08 22:35:45 - risk_forecasting - INFO - fetch_multiple_series:253 - Fetching 4 series concurrently
+2025-11-08 22:35:45 - risk_forecasting - INFO - _load_from_cache:113 - Loaded UNRATE from cache (73 observations)
+2025-11-08 22:35:45 - risk_forecasting - INFO - _load_from_cache:113 - Loaded FEDFUNDS from cache (73 observations)
+2025-11-08 22:35:45 - risk_forecasting - INFO - _load_from_cache:113 - Loaded CPIAUCSL from cache (73 observations)
+2025-11-08 22:35:45 - risk_forecasting - INFO - _load_from_cache:113 - Loaded BAA10Y from cache (1566 observations)
+2025-11-08 22:35:45 - risk_forecasting - INFO - fetch_multiple_series:279 - Successfully fetched 4/4 series
+2025-11-08 22:35:45 - risk_forecasting - INFO - transform:60 - inflation: Handled 1 missing values (1 remaining)
+2025-11-08 22:35:45 - risk_forecasting - INFO - transform:60 - credit_spread: Handled 69 missing values (1 remaining)
+2025-11-08 22:36:03 - risk_forecasting - INFO - print_section:23 - 
+======================================================================
+2025-11-08 22:36:03 - risk_forecasting - INFO - print_section:24 -   US FINANCIAL RISK FORECASTING SYSTEM - MVP
+2025-11-08 22:36:03 - risk_forecasting - INFO - print_section:25 - ======================================================================
+2025-11-08 22:36:03 - risk_forecasting - INFO - print_section:23 - 
+======================================================================
+2025-11-08 22:36:03 - risk_forecasting - INFO - print_section:24 -   STEP 1: Data Acquisition from FRED
+2025-11-08 22:36:03 - risk_forecasting - INFO - print_section:25 - ======================================================================
+2025-11-08 22:36:03 - risk_forecasting - INFO - __init__:51 - FRED Client initialized with cache dir: data/cache
+2025-11-08 22:36:03 - risk_forecasting - INFO - __init__:133 - DataPipeline initialized with output dir: data/processed
+2025-11-08 22:36:03 - risk_forecasting - INFO - __init__:37 - MissingValueHandler initialized with method: ffill
+2025-11-08 22:36:03 - risk_forecasting - INFO - __init__:81 - FrequencyAligner initialized with frequency: M
+2025-11-08 22:36:03 - risk_forecasting - INFO - process:155 - Processing 4 series through pipeline
+2025-11-08 22:36:03 - risk_forecasting - INFO - _fetch_series:186 - Fetching series from FRED
+2025-11-08 22:36:03 - risk_forecasting - INFO - fetch_multiple_series:253 - Fetching 4 series concurrently
+2025-11-08 22:36:03 - risk_forecasting - INFO - _load_from_cache:113 - Loaded UNRATE from cache (73 observations)
+2025-11-08 22:36:03 - risk_forecasting - INFO - _load_from_cache:113 - Loaded CPIAUCSL from cache (73 observations)
+2025-11-08 22:36:03 - risk_forecasting - INFO - _load_from_cache:113 - Loaded BAA10Y from cache (1566 observations)
+2025-11-08 22:36:03 - risk_forecasting - INFO - _load_from_cache:113 - Loaded FEDFUNDS from cache (73 observations)
+2025-11-08 22:36:03 - risk_forecasting - INFO - fetch_multiple_series:279 - Successfully fetched 4/4 series
+2025-11-08 22:36:03 - risk_forecasting - INFO - transform:60 - inflation: Handled 1 missing values (1 remaining)
+2025-11-08 22:36:03 - risk_forecasting - INFO - transform:60 - credit_spread: Handled 69 missing values (1 remaining)
+2025-11-08 22:36:45 - risk_forecasting - INFO - print_section:23 - 
+======================================================================
+2025-11-08 22:36:45 - risk_forecasting - INFO - print_section:24 -   US FINANCIAL RISK FORECASTING SYSTEM - MVP
+2025-11-08 22:36:45 - risk_forecasting - INFO - print_section:25 - ======================================================================
+2025-11-08 22:36:45 - risk_forecasting - INFO - print_section:23 - 
+======================================================================
+2025-11-08 22:36:45 - risk_forecasting - INFO - print_section:24 -   STEP 1: Data Acquisition from FRED
+2025-11-08 22:36:45 - risk_forecasting - INFO - print_section:25 - ======================================================================
+2025-11-08 22:36:45 - risk_forecasting - INFO - __init__:51 - FRED Client initialized with cache dir: data/cache
+2025-11-08 22:36:45 - risk_forecasting - INFO - __init__:133 - DataPipeline initialized with output dir: data/processed
+2025-11-08 22:36:45 - risk_forecasting - INFO - __init__:37 - MissingValueHandler initialized with method: ffill
+2025-11-08 22:36:45 - risk_forecasting - INFO - __init__:81 - FrequencyAligner initialized with frequency: M
+2025-11-08 22:36:45 - risk_forecasting - INFO - process:155 - Processing 4 series through pipeline
+2025-11-08 22:36:45 - risk_forecasting - INFO - _fetch_series:186 - Fetching series from FRED
+2025-11-08 22:36:45 - risk_forecasting - INFO - fetch_multiple_series:257 - Fetching 4 series concurrently
+2025-11-08 22:36:45 - risk_forecasting - INFO - _load_from_cache:113 - Loaded UNRATE from cache (73 observations)
+2025-11-08 22:36:45 - risk_forecasting - INFO - _load_from_cache:113 - Loaded FEDFUNDS from cache (73 observations)
+2025-11-08 22:36:45 - risk_forecasting - INFO - _load_from_cache:113 - Loaded BAA10Y from cache (1566 observations)
+2025-11-08 22:36:45 - risk_forecasting - INFO - _load_from_cache:113 - Loaded CPIAUCSL from cache (73 observations)
+2025-11-08 22:36:45 - risk_forecasting - INFO - fetch_multiple_series:283 - Successfully fetched 4/4 series
+2025-11-08 22:36:45 - risk_forecasting - INFO - transform:60 - inflation: Handled 1 missing values (1 remaining)
+2025-11-08 22:36:45 - risk_forecasting - INFO - transform:60 - credit_spread: Handled 69 missing values (1 remaining)
+2025-11-08 22:37:18 - risk_forecasting - INFO - main:18 - ============================================================
+2025-11-08 22:37:18 - risk_forecasting - INFO - main:19 - Testing US Risk Forecasting Data Pipeline
+2025-11-08 22:37:18 - risk_forecasting - INFO - main:20 - ============================================================
+2025-11-08 22:37:18 - risk_forecasting - INFO - __init__:51 - FRED Client initialized with cache dir: data/cache
+2025-11-08 22:37:18 - risk_forecasting - INFO - __init__:133 - DataPipeline initialized with output dir: data/processed
+2025-11-08 22:37:18 - risk_forecasting - INFO - __init__:37 - MissingValueHandler initialized with method: ffill
+2025-11-08 22:37:18 - risk_forecasting - INFO - __init__:81 - FrequencyAligner initialized with frequency: M
+2025-11-08 22:37:18 - risk_forecasting - INFO - main:64 - 
+Processing economic indicators...
+2025-11-08 22:37:18 - risk_forecasting - INFO - process:155 - Processing 4 series through pipeline
+2025-11-08 22:37:18 - risk_forecasting - INFO - _fetch_series:186 - Fetching series from FRED
+2025-11-08 22:37:18 - risk_forecasting - INFO - fetch_multiple_series:257 - Fetching 4 series concurrently
+2025-11-08 22:37:18 - risk_forecasting - INFO - _load_from_cache:113 - Loaded FEDFUNDS from cache (49 observations)
+2025-11-08 22:37:18 - risk_forecasting - INFO - _load_from_cache:113 - Loaded CPIAUCSL from cache (49 observations)
+2025-11-08 22:37:18 - risk_forecasting - INFO - _load_from_cache:113 - Loaded GDP from cache (17 observations)
+2025-11-08 22:37:18 - risk_forecasting - INFO - _load_from_cache:113 - Loaded UNRATE from cache (49 observations)
+2025-11-08 22:37:18 - risk_forecasting - INFO - fetch_multiple_series:283 - Successfully fetched 4/4 series
+2025-11-08 22:37:18 - risk_forecasting - INFO - transform:60 - inflation: Handled 1 missing values (1 remaining)
+2025-11-08 22:38:49 - risk_forecasting - INFO - __init__:51 - FRED Client initialized with cache dir: data/cache
+2025-11-08 22:38:49 - risk_forecasting - INFO - __init__:133 - DataPipeline initialized with output dir: data/processed
+2025-11-08 22:38:49 - risk_forecasting - INFO - __init__:37 - MissingValueHandler initialized with method: ffill
+2025-11-08 22:38:49 - risk_forecasting - INFO - __init__:81 - FrequencyAligner initialized with frequency: M
+2025-11-08 22:38:49 - risk_forecasting - INFO - process:155 - Processing 4 series through pipeline
+2025-11-08 22:38:49 - risk_forecasting - INFO - _fetch_series:186 - Fetching series from FRED
+2025-11-08 22:38:49 - risk_forecasting - INFO - fetch_multiple_series:257 - Fetching 4 series concurrently
+2025-11-08 22:38:49 - risk_forecasting - INFO - _load_from_cache:113 - Loaded CPIAUCSL from cache (73 observations)
+2025-11-08 22:38:49 - risk_forecasting - INFO - _load_from_cache:113 - Loaded FEDFUNDS from cache (73 observations)
+2025-11-08 22:38:49 - risk_forecasting - INFO - _load_from_cache:113 - Loaded BAA10Y from cache (1566 observations)
+2025-11-08 22:38:49 - risk_forecasting - INFO - _load_from_cache:113 - Loaded UNRATE from cache (73 observations)
+2025-11-08 22:38:49 - risk_forecasting - INFO - fetch_multiple_series:283 - Successfully fetched 4/4 series
+2025-11-08 22:38:49 - risk_forecasting - INFO - transform:60 - inflation: Handled 1 missing values (1 remaining)
+2025-11-08 22:38:49 - risk_forecasting - INFO - transform:60 - credit_spread: Handled 69 missing values (1 remaining)
+2025-11-08 23:56:01 - risk_forecasting - INFO - __init__:51 - FRED Client initialized with cache dir: data/cache
+2025-11-08 23:56:01 - risk_forecasting - INFO - __init__:138 - DataPipeline initialized with output dir: data/processed
+2025-11-08 23:56:01 - risk_forecasting - INFO - __init__:37 - MissingValueHandler initialized with method: ffill
+2025-11-08 23:56:01 - risk_forecasting - INFO - __init__:81 - FrequencyAligner initialized with frequency: M
+2025-11-08 23:56:01 - risk_forecasting - INFO - process:160 - Processing 4 series through pipeline
+2025-11-08 23:56:01 - risk_forecasting - INFO - _fetch_series:191 - Fetching series from FRED
+2025-11-08 23:56:01 - risk_forecasting - INFO - fetch_multiple_series:257 - Fetching 4 series concurrently
+2025-11-08 23:56:01 - risk_forecasting - INFO - _load_from_cache:113 - Loaded UNRATE from cache (73 observations)
+2025-11-08 23:56:01 - risk_forecasting - INFO - _load_from_cache:113 - Loaded FEDFUNDS from cache (73 observations)
+2025-11-08 23:56:01 - risk_forecasting - INFO - _load_from_cache:113 - Loaded BAA10Y from cache (1566 observations)
+2025-11-08 23:56:01 - risk_forecasting - INFO - _load_from_cache:113 - Loaded CPIAUCSL from cache (73 observations)
+2025-11-08 23:56:01 - risk_forecasting - INFO - fetch_multiple_series:283 - Successfully fetched 4/4 series
+2025-11-08 23:56:01 - risk_forecasting - INFO - transform:60 - inflation: Handled 1 missing values (1 remaining)
+2025-11-08 23:56:01 - risk_forecasting - INFO - transform:60 - credit_spread: Handled 69 missing values (1 remaining)
+2025-11-08 23:56:01 - risk_forecasting - INFO - _align_and_merge:256 - Common date range: 2018-02-28 00:00:00 to 2024-01-31 00:00:00
+2025-11-08 23:56:01 - risk_forecasting - INFO - _save_versioned_dataset:330 - Saved versioned dataset: 20251108_235601
+2025-11-08 23:56:01 - risk_forecasting - INFO - process:179 - Pipeline complete: 72 observations, 4 series
+2025-11-08 23:56:12 - risk_forecasting - INFO - print_section:23 - 
+======================================================================
+2025-11-08 23:56:12 - risk_forecasting - INFO - print_section:24 -   US FINANCIAL RISK FORECASTING SYSTEM - MVP
+2025-11-08 23:56:12 - risk_forecasting - INFO - print_section:25 - ======================================================================
+2025-11-08 23:56:12 - risk_forecasting - INFO - print_section:23 - 
+======================================================================
+2025-11-08 23:56:12 - risk_forecasting - INFO - print_section:24 -   STEP 1: Data Acquisition from FRED
+2025-11-08 23:56:12 - risk_forecasting - INFO - print_section:25 - ======================================================================
+2025-11-08 23:56:12 - risk_forecasting - INFO - __init__:51 - FRED Client initialized with cache dir: data/cache
+2025-11-08 23:56:12 - risk_forecasting - INFO - __init__:138 - DataPipeline initialized with output dir: data/processed
+2025-11-08 23:56:12 - risk_forecasting - INFO - __init__:37 - MissingValueHandler initialized with method: ffill
+2025-11-08 23:56:12 - risk_forecasting - INFO - __init__:81 - FrequencyAligner initialized with frequency: M
+2025-11-08 23:56:12 - risk_forecasting - INFO - process:160 - Processing 4 series through pipeline
+2025-11-08 23:56:12 - risk_forecasting - INFO - _fetch_series:191 - Fetching series from FRED
+2025-11-08 23:56:12 - risk_forecasting - INFO - fetch_multiple_series:257 - Fetching 4 series concurrently
+2025-11-08 23:56:12 - risk_forecasting - INFO - _load_from_cache:113 - Loaded UNRATE from cache (73 observations)
+2025-11-08 23:56:12 - risk_forecasting - INFO - _load_from_cache:113 - Loaded FEDFUNDS from cache (73 observations)
+2025-11-08 23:56:12 - risk_forecasting - INFO - _load_from_cache:113 - Loaded CPIAUCSL from cache (73 observations)
+2025-11-08 23:56:12 - risk_forecasting - INFO - _load_from_cache:113 - Loaded BAA10Y from cache (1566 observations)
+2025-11-08 23:56:12 - risk_forecasting - INFO - fetch_multiple_series:283 - Successfully fetched 4/4 series
+2025-11-08 23:56:12 - risk_forecasting - INFO - transform:60 - inflation: Handled 1 missing values (1 remaining)
+2025-11-08 23:56:12 - risk_forecasting - INFO - transform:60 - credit_spread: Handled 69 missing values (1 remaining)
+2025-11-08 23:56:12 - risk_forecasting - INFO - _align_and_merge:256 - Common date range: 2018-02-28 00:00:00 to 2024-01-31 00:00:00
+2025-11-08 23:56:12 - risk_forecasting - INFO - _save_versioned_dataset:330 - Saved versioned dataset: 20251108_235612
+2025-11-08 23:56:12 - risk_forecasting - INFO - process:179 - Pipeline complete: 72 observations, 4 series
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:80 - 
+✓ Fetched 72 observations
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:81 -   Date range: 2018-02-28 to 2024-01-31
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:82 -   Indicators: ['unemployment', 'inflation', 'interest_rate', 'credit_spread']
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:83 - 
+Latest values:
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:85 -   unemployment: 3.7000
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:85 -   inflation: 0.0034
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:85 -   interest_rate: 5.3300
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:85 -   credit_spread: 1.6100
+2025-11-08 23:56:12 - risk_forecasting - INFO - print_section:23 - 
+======================================================================
+2025-11-08 23:56:12 - risk_forecasting - INFO - print_section:24 -   STEP 2: Generate Economic Forecasts
+2025-11-08 23:56:12 - risk_forecasting - INFO - print_section:25 - ======================================================================
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:96 - 
+Generating 6-month forecasts...
+2025-11-08 23:56:12 - risk_forecasting - INFO - __init__:38 - Initialized NemotronTimeSeriesForecaster with model: nvidia/llama-3.1-nemotron-70b-instruct
+2025-11-08 23:56:12 - risk_forecasting - INFO - __init__:283 - Initialized LLM Ensemble Forecaster
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:104 - 
+Forecasting unemployment...
+2025-11-08 23:56:12 - risk_forecasting - INFO - forecast:184 - Generating LLM forecast for unemployment, horizon=6
+2025-11-08 23:56:12 - risk_forecasting - WARNING - _call_llm:74 - Nemotron returned status 500
+2025-11-08 23:56:12 - risk_forecasting - INFO - _call_llm:82 - Falling back to Ollama
+2025-11-08 23:56:12 - risk_forecasting - ERROR - _call_llm:99 - Ollama fallback failed: HTTPConnectionPool(host='localhost', port=11434): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x117d77250>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-11-08 23:56:12 - risk_forecasting - ERROR - forecast:225 - Failed to parse LLM response: Both Nemotron and Ollama failed
+2025-11-08 23:56:12 - risk_forecasting - WARNING - forecast:227 - Using naive forecast as fallback
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:117 -   LLM reasoning: Fallback: naive forecast (last value repeated)...
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:104 - 
+Forecasting inflation...
+2025-11-08 23:56:12 - risk_forecasting - INFO - forecast:184 - Generating LLM forecast for inflation, horizon=6
+2025-11-08 23:56:12 - risk_forecasting - WARNING - _call_llm:74 - Nemotron returned status 500
+2025-11-08 23:56:12 - risk_forecasting - INFO - _call_llm:82 - Falling back to Ollama
+2025-11-08 23:56:12 - risk_forecasting - ERROR - _call_llm:99 - Ollama fallback failed: HTTPConnectionPool(host='localhost', port=11434): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x117e129e0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-11-08 23:56:12 - risk_forecasting - ERROR - forecast:225 - Failed to parse LLM response: Both Nemotron and Ollama failed
+2025-11-08 23:56:12 - risk_forecasting - WARNING - forecast:227 - Using naive forecast as fallback
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:117 -   LLM reasoning: Fallback: naive forecast (last value repeated)...
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:104 - 
+Forecasting interest_rate...
+2025-11-08 23:56:12 - risk_forecasting - INFO - forecast:184 - Generating LLM forecast for interest_rate, horizon=6
+2025-11-08 23:56:12 - risk_forecasting - WARNING - _call_llm:74 - Nemotron returned status 500
+2025-11-08 23:56:12 - risk_forecasting - INFO - _call_llm:82 - Falling back to Ollama
+2025-11-08 23:56:12 - risk_forecasting - ERROR - _call_llm:99 - Ollama fallback failed: HTTPConnectionPool(host='localhost', port=11434): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x117dce330>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-11-08 23:56:12 - risk_forecasting - ERROR - forecast:225 - Failed to parse LLM response: Both Nemotron and Ollama failed
+2025-11-08 23:56:12 - risk_forecasting - WARNING - forecast:227 - Using naive forecast as fallback
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:117 -   LLM reasoning: Fallback: naive forecast (last value repeated)...
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:104 - 
+Forecasting credit_spread...
+2025-11-08 23:56:12 - risk_forecasting - INFO - forecast:184 - Generating LLM forecast for credit_spread, horizon=6
+2025-11-08 23:56:12 - risk_forecasting - WARNING - _call_llm:74 - Nemotron returned status 500
+2025-11-08 23:56:12 - risk_forecasting - INFO - _call_llm:82 - Falling back to Ollama
+2025-11-08 23:56:12 - risk_forecasting - ERROR - _call_llm:99 - Ollama fallback failed: HTTPConnectionPool(host='localhost', port=11434): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x117ed0380>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-11-08 23:56:12 - risk_forecasting - ERROR - forecast:225 - Failed to parse LLM response: Both Nemotron and Ollama failed
+2025-11-08 23:56:12 - risk_forecasting - WARNING - forecast:227 - Using naive forecast as fallback
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:117 -   LLM reasoning: Fallback: naive forecast (last value repeated)...
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:136 - 
+✓ Generated forecasts for 4 indicators
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:137 - 
+Forecast summary:
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:138 -             unemployment  inflation  interest_rate  credit_spread
+2024-02-29      3.666667   0.003872           5.33       1.605556
+2024-03-31      3.633333   0.004315           5.33       1.601111
+2024-04-30      3.600000   0.004757           5.33       1.596667
+2024-05-31      3.566667   0.005199           5.33       1.592222
+2024-06-30      3.533333   0.005641           5.33       1.587778
+2024-07-31      3.500000   0.006084           5.33       1.583333
+2025-11-08 23:56:12 - risk_forecasting - INFO - print_section:23 - 
+======================================================================
+2025-11-08 23:56:12 - risk_forecasting - INFO - print_section:24 -   STEP 3: Compute Key Risk Indicators
+2025-11-08 23:56:12 - risk_forecasting - INFO - print_section:25 - ======================================================================
+2025-11-08 23:56:12 - risk_forecasting - INFO - __init__:20 - KRI Calculator initialized
+2025-11-08 23:56:12 - risk_forecasting - INFO - compute_credit_kris:66 - Computed 4 credit KRIs
+2025-11-08 23:56:12 - risk_forecasting - INFO - compute_market_kris:116 - Computed 3 market KRIs
+2025-11-08 23:56:12 - risk_forecasting - INFO - compute_liquidity_kris:154 - Computed 2 liquidity KRIs
+2025-11-08 23:56:12 - risk_forecasting - INFO - compute_all_kris:176 - Computed total of 9 KRIs
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:158 - 
+✓ Computed 9 KRIs
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:159 - 
+KRI Values:
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:163 -   loan_default_rate: 0.02 %
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:163 -   delinquency_rate: 2.70 %
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:163 -   credit_quality_score: 750.00 score
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:163 -   loan_concentration: 25.00 %
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:163 -   portfolio_volatility: 1.44 %
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:163 -   var_95: 2.50 %
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:163 -   interest_rate_risk: 0.50 years
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:163 -   liquidity_coverage_ratio: 1.30 ratio
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:163 -   deposit_flow_ratio: -2.00 %
+2025-11-08 23:56:12 - risk_forecasting - INFO - print_section:23 - 
+======================================================================
+2025-11-08 23:56:12 - risk_forecasting - INFO - print_section:24 -   STEP 4: Risk Assessment & Threshold Evaluation
+2025-11-08 23:56:12 - risk_forecasting - INFO - print_section:25 - ======================================================================
+2025-11-08 23:56:12 - risk_forecasting - INFO - evaluate_thresholds:233 - Risk levels: {'low': 5, 'medium': 3, 'high': 0, 'critical': 1}
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:173 - 
+Risk Level Assessment:
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:181 -   [LOW     ] loan_default_rate: 0.02 %
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:181 -   [LOW     ] delinquency_rate: 2.70 %
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:181 -   [LOW     ] credit_quality_score: 750.00 score
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:181 -   [MEDIUM  ] loan_concentration: 25.00 %
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:181 -   [LOW     ] portfolio_volatility: 1.44 %
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:181 -   [MEDIUM  ] var_95: 2.50 %
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:181 -   [LOW     ] interest_rate_risk: 0.50 years
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:181 -   [MEDIUM  ] liquidity_coverage_ratio: 1.30 ratio
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:181 -   [CRITICAL] deposit_flow_ratio: -2.00 %
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:188 - 
+Risk Summary:
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:190 -   CRITICAL: 1 KRIs
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:190 -   LOW: 5 KRIs
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:190 -   MEDIUM: 3 KRIs
+2025-11-08 23:56:12 - risk_forecasting - INFO - print_section:23 - 
+======================================================================
+2025-11-08 23:56:12 - risk_forecasting - INFO - print_section:24 -   STEP 5: Risk Report Summary
+2025-11-08 23:56:12 - risk_forecasting - INFO - print_section:25 - ======================================================================
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:202 - 
+⚠️  ATTENTION REQUIRED:
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:208 - 
+  • DEPOSIT_FLOW_RATIO
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:209 -     Current Value: -2.00 %
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:210 -     Risk Level: CRITICAL
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:211 -     Category: liquidity
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:212 -     Description: Net deposit inflows/outflows as % of total deposits
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:217 - 
+Key Insights:
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:218 -   • Latest unemployment: 3.7%
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:219 -   • Forecast unemployment (6mo): 3.5%
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:220 -   • Interest rate: 5.33%
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:221 -   • Credit spread: 1.61%
+2025-11-08 23:56:12 - risk_forecasting - INFO - print_section:23 - 
+======================================================================
+2025-11-08 23:56:12 - risk_forecasting - INFO - print_section:24 -   ✓ RISK FORECASTING COMPLETE
+2025-11-08 23:56:12 - risk_forecasting - INFO - print_section:25 - ======================================================================
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:228 - 
+System Components Demonstrated:
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:229 -   ✓ FRED data acquisition with caching
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:230 -   ✓ Data pipeline with ETL transformations
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:231 -   ✓ LLM-based forecasting with Nemotron
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:232 -   ✓ KRI calculation across risk categories
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:233 -   ✓ Risk threshold evaluation
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:234 -   ✓ Automated risk reporting
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:236 - 
+Data saved to:
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:237 -   • Cache: data/cache/
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:238 -   • Processed: data/processed/
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:239 -   • Logs: logs/risk_forecasting.log
+2025-11-08 23:56:12 - risk_forecasting - INFO - main:241 - 
+======================================================================
+2025-11-08 23:56:21 - risk_forecasting - INFO - print_section:23 - 
+======================================================================
+2025-11-08 23:56:21 - risk_forecasting - INFO - print_section:24 -   US FINANCIAL RISK FORECASTING SYSTEM - MVP
+2025-11-08 23:56:21 - risk_forecasting - INFO - print_section:25 - ======================================================================
+2025-11-08 23:56:21 - risk_forecasting - INFO - print_section:23 - 
+======================================================================
+2025-11-08 23:56:21 - risk_forecasting - INFO - print_section:24 -   STEP 1: Data Acquisition from FRED
+2025-11-08 23:56:21 - risk_forecasting - INFO - print_section:25 - ======================================================================
+2025-11-08 23:56:21 - risk_forecasting - INFO - __init__:51 - FRED Client initialized with cache dir: data/cache
+2025-11-08 23:56:21 - risk_forecasting - INFO - __init__:138 - DataPipeline initialized with output dir: data/processed
+2025-11-08 23:56:21 - risk_forecasting - INFO - __init__:37 - MissingValueHandler initialized with method: ffill
+2025-11-08 23:56:21 - risk_forecasting - INFO - __init__:81 - FrequencyAligner initialized with frequency: M
+2025-11-08 23:56:21 - risk_forecasting - INFO - process:160 - Processing 4 series through pipeline
+2025-11-08 23:56:21 - risk_forecasting - INFO - _fetch_series:191 - Fetching series from FRED
+2025-11-08 23:56:21 - risk_forecasting - INFO - fetch_multiple_series:257 - Fetching 4 series concurrently
+2025-11-08 23:56:21 - risk_forecasting - INFO - _load_from_cache:113 - Loaded CPIAUCSL from cache (73 observations)
+2025-11-08 23:56:21 - risk_forecasting - INFO - _load_from_cache:113 - Loaded FEDFUNDS from cache (73 observations)
+2025-11-08 23:56:21 - risk_forecasting - INFO - _load_from_cache:113 - Loaded BAA10Y from cache (1566 observations)
+2025-11-08 23:56:21 - risk_forecasting - INFO - _load_from_cache:113 - Loaded UNRATE from cache (73 observations)
+2025-11-08 23:56:21 - risk_forecasting - INFO - fetch_multiple_series:283 - Successfully fetched 4/4 series
+2025-11-08 23:56:21 - risk_forecasting - INFO - transform:60 - inflation: Handled 1 missing values (1 remaining)
+2025-11-08 23:56:21 - risk_forecasting - INFO - transform:60 - credit_spread: Handled 69 missing values (1 remaining)
+2025-11-08 23:56:21 - risk_forecasting - INFO - _align_and_merge:256 - Common date range: 2018-02-28 00:00:00 to 2024-01-31 00:00:00
+2025-11-08 23:56:21 - risk_forecasting - INFO - _save_versioned_dataset:330 - Saved versioned dataset: 20251108_235621
+2025-11-08 23:56:21 - risk_forecasting - INFO - process:179 - Pipeline complete: 72 observations, 4 series
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:80 - 
+✓ Fetched 72 observations
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:81 -   Date range: 2018-02-28 to 2024-01-31
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:82 -   Indicators: ['unemployment', 'inflation', 'interest_rate', 'credit_spread']
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:83 - 
+Latest values:
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:85 -   unemployment: 3.7000
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:85 -   inflation: 0.0034
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:85 -   interest_rate: 5.3300
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:85 -   credit_spread: 1.6100
+2025-11-08 23:56:21 - risk_forecasting - INFO - print_section:23 - 
+======================================================================
+2025-11-08 23:56:21 - risk_forecasting - INFO - print_section:24 -   STEP 2: Generate Economic Forecasts
+2025-11-08 23:56:21 - risk_forecasting - INFO - print_section:25 - ======================================================================
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:96 - 
+Generating 6-month forecasts...
+2025-11-08 23:56:21 - risk_forecasting - INFO - __init__:38 - Initialized NemotronTimeSeriesForecaster with model: nvidia/llama-3.1-nemotron-70b-instruct
+2025-11-08 23:56:21 - risk_forecasting - INFO - __init__:283 - Initialized LLM Ensemble Forecaster
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:104 - 
+Forecasting unemployment...
+2025-11-08 23:56:21 - risk_forecasting - INFO - forecast:184 - Generating LLM forecast for unemployment, horizon=6
+2025-11-08 23:56:21 - risk_forecasting - WARNING - _call_llm:74 - Nemotron returned status 500
+2025-11-08 23:56:21 - risk_forecasting - INFO - _call_llm:82 - Falling back to Ollama
+2025-11-08 23:56:21 - risk_forecasting - ERROR - _call_llm:99 - Ollama fallback failed: HTTPConnectionPool(host='localhost', port=11434): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10777bb10>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-11-08 23:56:21 - risk_forecasting - ERROR - forecast:225 - Failed to parse LLM response: Both Nemotron and Ollama failed
+2025-11-08 23:56:21 - risk_forecasting - WARNING - forecast:227 - Using naive forecast as fallback
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:117 -   LLM reasoning: Fallback: naive forecast (last value repeated)...
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:104 - 
+Forecasting inflation...
+2025-11-08 23:56:21 - risk_forecasting - INFO - forecast:184 - Generating LLM forecast for inflation, horizon=6
+2025-11-08 23:56:21 - risk_forecasting - WARNING - _call_llm:74 - Nemotron returned status 500
+2025-11-08 23:56:21 - risk_forecasting - INFO - _call_llm:82 - Falling back to Ollama
+2025-11-08 23:56:21 - risk_forecasting - ERROR - _call_llm:99 - Ollama fallback failed: HTTPConnectionPool(host='localhost', port=11434): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1078129e0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-11-08 23:56:21 - risk_forecasting - ERROR - forecast:225 - Failed to parse LLM response: Both Nemotron and Ollama failed
+2025-11-08 23:56:21 - risk_forecasting - WARNING - forecast:227 - Using naive forecast as fallback
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:117 -   LLM reasoning: Fallback: naive forecast (last value repeated)...
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:104 - 
+Forecasting interest_rate...
+2025-11-08 23:56:21 - risk_forecasting - INFO - forecast:184 - Generating LLM forecast for interest_rate, horizon=6
+2025-11-08 23:56:21 - risk_forecasting - WARNING - _call_llm:74 - Nemotron returned status 500
+2025-11-08 23:56:21 - risk_forecasting - INFO - _call_llm:82 - Falling back to Ollama
+2025-11-08 23:56:21 - risk_forecasting - ERROR - _call_llm:99 - Ollama fallback failed: HTTPConnectionPool(host='localhost', port=11434): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1077ce330>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-11-08 23:56:21 - risk_forecasting - ERROR - forecast:225 - Failed to parse LLM response: Both Nemotron and Ollama failed
+2025-11-08 23:56:21 - risk_forecasting - WARNING - forecast:227 - Using naive forecast as fallback
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:117 -   LLM reasoning: Fallback: naive forecast (last value repeated)...
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:104 - 
+Forecasting credit_spread...
+2025-11-08 23:56:21 - risk_forecasting - INFO - forecast:184 - Generating LLM forecast for credit_spread, horizon=6
+2025-11-08 23:56:21 - risk_forecasting - WARNING - _call_llm:74 - Nemotron returned status 500
+2025-11-08 23:56:21 - risk_forecasting - INFO - _call_llm:82 - Falling back to Ollama
+2025-11-08 23:56:21 - risk_forecasting - ERROR - _call_llm:99 - Ollama fallback failed: HTTPConnectionPool(host='localhost', port=11434): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1078b4380>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-11-08 23:56:21 - risk_forecasting - ERROR - forecast:225 - Failed to parse LLM response: Both Nemotron and Ollama failed
+2025-11-08 23:56:21 - risk_forecasting - WARNING - forecast:227 - Using naive forecast as fallback
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:117 -   LLM reasoning: Fallback: naive forecast (last value repeated)...
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:136 - 
+✓ Generated forecasts for 4 indicators
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:137 - 
+Forecast summary:
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:138 -             unemployment  inflation  interest_rate  credit_spread
+2024-02-29      3.666667   0.003872           5.33       1.605556
+2024-03-31      3.633333   0.004315           5.33       1.601111
+2024-04-30      3.600000   0.004757           5.33       1.596667
+2024-05-31      3.566667   0.005199           5.33       1.592222
+2024-06-30      3.533333   0.005641           5.33       1.587778
+2024-07-31      3.500000   0.006084           5.33       1.583333
+2025-11-08 23:56:21 - risk_forecasting - INFO - print_section:23 - 
+======================================================================
+2025-11-08 23:56:21 - risk_forecasting - INFO - print_section:24 -   STEP 3: Compute Key Risk Indicators
+2025-11-08 23:56:21 - risk_forecasting - INFO - print_section:25 - ======================================================================
+2025-11-08 23:56:21 - risk_forecasting - INFO - __init__:20 - KRI Calculator initialized
+2025-11-08 23:56:21 - risk_forecasting - INFO - compute_credit_kris:66 - Computed 4 credit KRIs
+2025-11-08 23:56:21 - risk_forecasting - INFO - compute_market_kris:116 - Computed 3 market KRIs
+2025-11-08 23:56:21 - risk_forecasting - INFO - compute_liquidity_kris:154 - Computed 2 liquidity KRIs
+2025-11-08 23:56:21 - risk_forecasting - INFO - compute_all_kris:176 - Computed total of 9 KRIs
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:158 - 
+✓ Computed 9 KRIs
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:159 - 
+KRI Values:
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:163 -   loan_default_rate: 0.02 %
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:163 -   delinquency_rate: 2.70 %
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:163 -   credit_quality_score: 750.00 score
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:163 -   loan_concentration: 25.00 %
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:163 -   portfolio_volatility: 1.44 %
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:163 -   var_95: 2.50 %
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:163 -   interest_rate_risk: 0.50 years
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:163 -   liquidity_coverage_ratio: 1.30 ratio
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:163 -   deposit_flow_ratio: -2.00 %
+2025-11-08 23:56:21 - risk_forecasting - INFO - print_section:23 - 
+======================================================================
+2025-11-08 23:56:21 - risk_forecasting - INFO - print_section:24 -   STEP 4: Risk Assessment & Threshold Evaluation
+2025-11-08 23:56:21 - risk_forecasting - INFO - print_section:25 - ======================================================================
+2025-11-08 23:56:21 - risk_forecasting - INFO - evaluate_thresholds:233 - Risk levels: {'low': 5, 'medium': 3, 'high': 0, 'critical': 1}
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:173 - 
+Risk Level Assessment:
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:181 -   [LOW     ] loan_default_rate: 0.02 %
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:181 -   [LOW     ] delinquency_rate: 2.70 %
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:181 -   [LOW     ] credit_quality_score: 750.00 score
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:181 -   [MEDIUM  ] loan_concentration: 25.00 %
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:181 -   [LOW     ] portfolio_volatility: 1.44 %
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:181 -   [MEDIUM  ] var_95: 2.50 %
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:181 -   [LOW     ] interest_rate_risk: 0.50 years
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:181 -   [MEDIUM  ] liquidity_coverage_ratio: 1.30 ratio
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:181 -   [CRITICAL] deposit_flow_ratio: -2.00 %
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:188 - 
+Risk Summary:
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:190 -   CRITICAL: 1 KRIs
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:190 -   LOW: 5 KRIs
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:190 -   MEDIUM: 3 KRIs
+2025-11-08 23:56:21 - risk_forecasting - INFO - print_section:23 - 
+======================================================================
+2025-11-08 23:56:21 - risk_forecasting - INFO - print_section:24 -   STEP 5: Risk Report Summary
+2025-11-08 23:56:21 - risk_forecasting - INFO - print_section:25 - ======================================================================
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:202 - 
+⚠️  ATTENTION REQUIRED:
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:208 - 
+  • DEPOSIT_FLOW_RATIO
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:209 -     Current Value: -2.00 %
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:210 -     Risk Level: CRITICAL
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:211 -     Category: liquidity
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:212 -     Description: Net deposit inflows/outflows as % of total deposits
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:217 - 
+Key Insights:
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:218 -   • Latest unemployment: 3.7%
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:219 -   • Forecast unemployment (6mo): 3.5%
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:220 -   • Interest rate: 5.33%
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:221 -   • Credit spread: 1.61%
+2025-11-08 23:56:21 - risk_forecasting - INFO - print_section:23 - 
+======================================================================
+2025-11-08 23:56:21 - risk_forecasting - INFO - print_section:24 -   ✓ RISK FORECASTING COMPLETE
+2025-11-08 23:56:21 - risk_forecasting - INFO - print_section:25 - ======================================================================
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:228 - 
+System Components Demonstrated:
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:229 -   ✓ FRED data acquisition with caching
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:230 -   ✓ Data pipeline with ETL transformations
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:231 -   ✓ LLM-based forecasting with Nemotron
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:232 -   ✓ KRI calculation across risk categories
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:233 -   ✓ Risk threshold evaluation
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:234 -   ✓ Automated risk reporting
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:236 - 
+Data saved to:
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:237 -   • Cache: data/cache/
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:238 -   • Processed: data/processed/
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:239 -   • Logs: logs/risk_forecasting.log
+2025-11-08 23:56:21 - risk_forecasting - INFO - main:241 - 
+======================================================================
+2025-11-08 23:58:06 - risk_forecasting - INFO - print_section:23 - 
+======================================================================
+2025-11-08 23:58:06 - risk_forecasting - INFO - print_section:24 -   US FINANCIAL RISK FORECASTING SYSTEM - MVP
+2025-11-08 23:58:06 - risk_forecasting - INFO - print_section:25 - ======================================================================
+2025-11-08 23:58:06 - risk_forecasting - INFO - print_section:23 - 
+======================================================================
+2025-11-08 23:58:06 - risk_forecasting - INFO - print_section:24 -   STEP 1: Data Acquisition from FRED
+2025-11-08 23:58:06 - risk_forecasting - INFO - print_section:25 - ======================================================================
+2025-11-08 23:58:06 - risk_forecasting - INFO - __init__:51 - FRED Client initialized with cache dir: data/cache
+2025-11-08 23:58:06 - risk_forecasting - INFO - __init__:138 - DataPipeline initialized with output dir: data/processed
+2025-11-08 23:58:06 - risk_forecasting - INFO - __init__:37 - MissingValueHandler initialized with method: ffill
+2025-11-08 23:58:06 - risk_forecasting - INFO - __init__:81 - FrequencyAligner initialized with frequency: M
+2025-11-08 23:58:06 - risk_forecasting - INFO - process:160 - Processing 4 series through pipeline
+2025-11-08 23:58:06 - risk_forecasting - INFO - _fetch_series:191 - Fetching series from FRED
+2025-11-08 23:58:06 - risk_forecasting - INFO - fetch_multiple_series:257 - Fetching 4 series concurrently
+2025-11-08 23:58:06 - risk_forecasting - INFO - _load_from_cache:113 - Loaded UNRATE from cache (73 observations)
+2025-11-08 23:58:06 - risk_forecasting - INFO - _load_from_cache:113 - Loaded CPIAUCSL from cache (73 observations)
+2025-11-08 23:58:06 - risk_forecasting - INFO - _load_from_cache:113 - Loaded FEDFUNDS from cache (73 observations)
+2025-11-08 23:58:06 - risk_forecasting - INFO - _load_from_cache:113 - Loaded BAA10Y from cache (1566 observations)
+2025-11-08 23:58:06 - risk_forecasting - INFO - fetch_multiple_series:283 - Successfully fetched 4/4 series
+2025-11-08 23:58:06 - risk_forecasting - INFO - transform:60 - inflation: Handled 1 missing values (1 remaining)
+2025-11-08 23:58:06 - risk_forecasting - INFO - transform:60 - credit_spread: Handled 69 missing values (1 remaining)
+2025-11-08 23:58:06 - risk_forecasting - INFO - _align_and_merge:256 - Common date range: 2018-02-28 00:00:00 to 2024-01-31 00:00:00
+2025-11-08 23:58:06 - risk_forecasting - INFO - _save_versioned_dataset:330 - Saved versioned dataset: 20251108_235806
+2025-11-08 23:58:06 - risk_forecasting - INFO - process:179 - Pipeline complete: 72 observations, 4 series
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:80 - 
+✓ Fetched 72 observations
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:81 -   Date range: 2018-02-28 to 2024-01-31
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:82 -   Indicators: ['unemployment', 'inflation', 'interest_rate', 'credit_spread']
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:83 - 
+Latest values:
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:85 -   unemployment: 3.7000
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:85 -   inflation: 0.0034
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:85 -   interest_rate: 5.3300
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:85 -   credit_spread: 1.6100
+2025-11-08 23:58:06 - risk_forecasting - INFO - print_section:23 - 
+======================================================================
+2025-11-08 23:58:06 - risk_forecasting - INFO - print_section:24 -   STEP 2: Generate Economic Forecasts
+2025-11-08 23:58:06 - risk_forecasting - INFO - print_section:25 - ======================================================================
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:96 - 
+Generating 6-month forecasts...
+2025-11-08 23:58:06 - risk_forecasting - INFO - __init__:38 - Initialized NemotronTimeSeriesForecaster with model: nvidia/llama-3.1-nemotron-70b-instruct
+2025-11-08 23:58:06 - risk_forecasting - INFO - __init__:283 - Initialized LLM Ensemble Forecaster
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:104 - 
+Forecasting unemployment...
+2025-11-08 23:58:06 - risk_forecasting - INFO - forecast:184 - Generating LLM forecast for unemployment, horizon=6
+2025-11-08 23:58:06 - risk_forecasting - WARNING - _call_llm:74 - Nemotron returned status 500
+2025-11-08 23:58:06 - risk_forecasting - INFO - _call_llm:82 - Falling back to Ollama
+2025-11-08 23:58:06 - risk_forecasting - ERROR - _call_llm:99 - Ollama fallback failed: HTTPConnectionPool(host='localhost', port=11434): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x11497bb10>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-11-08 23:58:06 - risk_forecasting - ERROR - forecast:225 - Failed to parse LLM response: Both Nemotron and Ollama failed
+2025-11-08 23:58:06 - risk_forecasting - WARNING - forecast:227 - Using naive forecast as fallback
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:117 -   LLM reasoning: Fallback: naive forecast (last value repeated)...
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:104 - 
+Forecasting inflation...
+2025-11-08 23:58:06 - risk_forecasting - INFO - forecast:184 - Generating LLM forecast for inflation, horizon=6
+2025-11-08 23:58:06 - risk_forecasting - WARNING - _call_llm:74 - Nemotron returned status 500
+2025-11-08 23:58:06 - risk_forecasting - INFO - _call_llm:82 - Falling back to Ollama
+2025-11-08 23:58:06 - risk_forecasting - ERROR - _call_llm:99 - Ollama fallback failed: HTTPConnectionPool(host='localhost', port=11434): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x114a129e0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-11-08 23:58:06 - risk_forecasting - ERROR - forecast:225 - Failed to parse LLM response: Both Nemotron and Ollama failed
+2025-11-08 23:58:06 - risk_forecasting - WARNING - forecast:227 - Using naive forecast as fallback
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:117 -   LLM reasoning: Fallback: naive forecast (last value repeated)...
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:104 - 
+Forecasting interest_rate...
+2025-11-08 23:58:06 - risk_forecasting - INFO - forecast:184 - Generating LLM forecast for interest_rate, horizon=6
+2025-11-08 23:58:06 - risk_forecasting - WARNING - _call_llm:74 - Nemotron returned status 500
+2025-11-08 23:58:06 - risk_forecasting - INFO - _call_llm:82 - Falling back to Ollama
+2025-11-08 23:58:06 - risk_forecasting - ERROR - _call_llm:99 - Ollama fallback failed: HTTPConnectionPool(host='localhost', port=11434): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1149ce330>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-11-08 23:58:06 - risk_forecasting - ERROR - forecast:225 - Failed to parse LLM response: Both Nemotron and Ollama failed
+2025-11-08 23:58:06 - risk_forecasting - WARNING - forecast:227 - Using naive forecast as fallback
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:117 -   LLM reasoning: Fallback: naive forecast (last value repeated)...
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:104 - 
+Forecasting credit_spread...
+2025-11-08 23:58:06 - risk_forecasting - INFO - forecast:184 - Generating LLM forecast for credit_spread, horizon=6
+2025-11-08 23:58:06 - risk_forecasting - WARNING - _call_llm:74 - Nemotron returned status 500
+2025-11-08 23:58:06 - risk_forecasting - INFO - _call_llm:82 - Falling back to Ollama
+2025-11-08 23:58:06 - risk_forecasting - ERROR - _call_llm:99 - Ollama fallback failed: HTTPConnectionPool(host='localhost', port=11434): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x114acc380>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-11-08 23:58:06 - risk_forecasting - ERROR - forecast:225 - Failed to parse LLM response: Both Nemotron and Ollama failed
+2025-11-08 23:58:06 - risk_forecasting - WARNING - forecast:227 - Using naive forecast as fallback
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:117 -   LLM reasoning: Fallback: naive forecast (last value repeated)...
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:136 - 
+✓ Generated forecasts for 4 indicators
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:137 - 
+Forecast summary:
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:138 -             unemployment  inflation  interest_rate  credit_spread
+2024-02-29      3.666667   0.003872           5.33       1.605556
+2024-03-31      3.633333   0.004315           5.33       1.601111
+2024-04-30      3.600000   0.004757           5.33       1.596667
+2024-05-31      3.566667   0.005199           5.33       1.592222
+2024-06-30      3.533333   0.005641           5.33       1.587778
+2024-07-31      3.500000   0.006084           5.33       1.583333
+2025-11-08 23:58:06 - risk_forecasting - INFO - print_section:23 - 
+======================================================================
+2025-11-08 23:58:06 - risk_forecasting - INFO - print_section:24 -   STEP 3: Compute Key Risk Indicators
+2025-11-08 23:58:06 - risk_forecasting - INFO - print_section:25 - ======================================================================
+2025-11-08 23:58:06 - risk_forecasting - INFO - __init__:20 - KRI Calculator initialized
+2025-11-08 23:58:06 - risk_forecasting - INFO - compute_credit_kris:66 - Computed 4 credit KRIs
+2025-11-08 23:58:06 - risk_forecasting - INFO - compute_market_kris:116 - Computed 3 market KRIs
+2025-11-08 23:58:06 - risk_forecasting - INFO - compute_liquidity_kris:154 - Computed 2 liquidity KRIs
+2025-11-08 23:58:06 - risk_forecasting - INFO - compute_all_kris:176 - Computed total of 9 KRIs
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:158 - 
+✓ Computed 9 KRIs
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:159 - 
+KRI Values:
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:163 -   loan_default_rate: 0.02 %
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:163 -   delinquency_rate: 2.70 %
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:163 -   credit_quality_score: 750.00 score
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:163 -   loan_concentration: 25.00 %
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:163 -   portfolio_volatility: 1.44 %
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:163 -   var_95: 2.50 %
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:163 -   interest_rate_risk: 0.50 years
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:163 -   liquidity_coverage_ratio: 1.30 ratio
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:163 -   deposit_flow_ratio: -2.00 %
+2025-11-08 23:58:06 - risk_forecasting - INFO - print_section:23 - 
+======================================================================
+2025-11-08 23:58:06 - risk_forecasting - INFO - print_section:24 -   STEP 4: Risk Assessment & Threshold Evaluation
+2025-11-08 23:58:06 - risk_forecasting - INFO - print_section:25 - ======================================================================
+2025-11-08 23:58:06 - risk_forecasting - INFO - evaluate_thresholds:233 - Risk levels: {'low': 5, 'medium': 3, 'high': 0, 'critical': 1}
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:173 - 
+Risk Level Assessment:
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:181 -   [LOW     ] loan_default_rate: 0.02 %
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:181 -   [LOW     ] delinquency_rate: 2.70 %
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:181 -   [LOW     ] credit_quality_score: 750.00 score
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:181 -   [MEDIUM  ] loan_concentration: 25.00 %
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:181 -   [LOW     ] portfolio_volatility: 1.44 %
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:181 -   [MEDIUM  ] var_95: 2.50 %
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:181 -   [LOW     ] interest_rate_risk: 0.50 years
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:181 -   [MEDIUM  ] liquidity_coverage_ratio: 1.30 ratio
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:181 -   [CRITICAL] deposit_flow_ratio: -2.00 %
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:188 - 
+Risk Summary:
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:190 -   CRITICAL: 1 KRIs
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:190 -   LOW: 5 KRIs
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:190 -   MEDIUM: 3 KRIs
+2025-11-08 23:58:06 - risk_forecasting - INFO - print_section:23 - 
+======================================================================
+2025-11-08 23:58:06 - risk_forecasting - INFO - print_section:24 -   STEP 5: Risk Report Summary
+2025-11-08 23:58:06 - risk_forecasting - INFO - print_section:25 - ======================================================================
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:202 - 
+⚠️  ATTENTION REQUIRED:
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:208 - 
+  • DEPOSIT_FLOW_RATIO
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:209 -     Current Value: -2.00 %
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:210 -     Risk Level: CRITICAL
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:211 -     Category: liquidity
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:212 -     Description: Net deposit inflows/outflows as % of total deposits
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:217 - 
+Key Insights:
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:218 -   • Latest unemployment: 3.7%
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:219 -   • Forecast unemployment (6mo): 3.5%
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:220 -   • Interest rate: 5.33%
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:221 -   • Credit spread: 1.61%
+2025-11-08 23:58:06 - risk_forecasting - INFO - print_section:23 - 
+======================================================================
+2025-11-08 23:58:06 - risk_forecasting - INFO - print_section:24 -   ✓ RISK FORECASTING COMPLETE
+2025-11-08 23:58:06 - risk_forecasting - INFO - print_section:25 - ======================================================================
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:228 - 
+System Components Demonstrated:
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:229 -   ✓ FRED data acquisition with caching
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:230 -   ✓ Data pipeline with ETL transformations
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:231 -   ✓ LLM-based forecasting with Nemotron
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:232 -   ✓ KRI calculation across risk categories
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:233 -   ✓ Risk threshold evaluation
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:234 -   ✓ Automated risk reporting
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:236 - 
+Data saved to:
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:237 -   • Cache: data/cache/
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:238 -   • Processed: data/processed/
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:239 -   • Logs: logs/risk_forecasting.log
+2025-11-08 23:58:06 - risk_forecasting - INFO - main:241 - 
+======================================================================
+2025-11-09 00:36:33 - risk_forecasting - INFO - <module>:260 - Starting Risk Forecasting API server...
+2025-11-09 00:36:33 - risk_forecasting - INFO - <module>:261 - API will be available at: http://localhost:8000
+2025-11-09 00:36:33 - risk_forecasting - INFO - <module>:262 - API docs at: http://localhost:8000/docs
+2025-11-09 00:36:33 - risk_forecasting - INFO - fetch_all_data:49 - Fetching data for API...
+2025-11-09 00:36:33 - risk_forecasting - INFO - __init__:51 - FRED Client initialized with cache dir: data/cache
+2025-11-09 00:36:33 - risk_forecasting - INFO - __init__:138 - DataPipeline initialized with output dir: data/processed
+2025-11-09 00:36:33 - risk_forecasting - INFO - __init__:37 - MissingValueHandler initialized with method: ffill
+2025-11-09 00:36:33 - risk_forecasting - INFO - __init__:81 - FrequencyAligner initialized with frequency: M
+2025-11-09 00:36:33 - risk_forecasting - INFO - process:160 - Processing 4 series through pipeline
+2025-11-09 00:36:33 - risk_forecasting - INFO - _fetch_series:191 - Fetching series from FRED
+2025-11-09 00:36:33 - risk_forecasting - INFO - fetch_multiple_series:257 - Fetching 4 series concurrently
+2025-11-09 00:36:33 - risk_forecasting - INFO - _load_from_cache:113 - Loaded UNRATE from cache (73 observations)
+2025-11-09 00:36:33 - risk_forecasting - INFO - _load_from_cache:113 - Loaded CPIAUCSL from cache (73 observations)
+2025-11-09 00:36:33 - risk_forecasting - INFO - _load_from_cache:113 - Loaded FEDFUNDS from cache (73 observations)
+2025-11-09 00:36:33 - risk_forecasting - INFO - _load_from_cache:113 - Loaded BAA10Y from cache (1566 observations)
+2025-11-09 00:36:33 - risk_forecasting - INFO - fetch_multiple_series:283 - Successfully fetched 4/4 series
+2025-11-09 00:36:33 - risk_forecasting - INFO - transform:60 - inflation: Handled 1 missing values (1 remaining)
+2025-11-09 00:36:33 - risk_forecasting - INFO - transform:60 - credit_spread: Handled 69 missing values (1 remaining)
+2025-11-09 00:36:33 - risk_forecasting - INFO - _align_and_merge:256 - Common date range: 2018-02-28 00:00:00 to 2024-01-31 00:00:00
+2025-11-09 00:36:33 - risk_forecasting - INFO - _save_versioned_dataset:330 - Saved versioned dataset: 20251109_003633
+2025-11-09 00:36:33 - risk_forecasting - INFO - process:179 - Pipeline complete: 72 observations, 4 series
+2025-11-09 00:36:33 - risk_forecasting - INFO - __init__:38 - Initialized NemotronTimeSeriesForecaster with model: nvidia/llama-3.1-nemotron-70b-instruct
+2025-11-09 00:36:33 - risk_forecasting - INFO - __init__:283 - Initialized LLM Ensemble Forecaster
+2025-11-09 00:36:33 - risk_forecasting - INFO - __init__:20 - KRI Calculator initialized
+2025-11-09 00:36:33 - risk_forecasting - INFO - compute_credit_kris:66 - Computed 4 credit KRIs
+2025-11-09 00:36:33 - risk_forecasting - INFO - compute_market_kris:116 - Computed 3 market KRIs
+2025-11-09 00:36:33 - risk_forecasting - INFO - compute_liquidity_kris:154 - Computed 2 liquidity KRIs
+2025-11-09 00:36:33 - risk_forecasting - INFO - compute_all_kris:176 - Computed total of 9 KRIs
+2025-11-09 00:36:33 - risk_forecasting - INFO - evaluate_thresholds:233 - Risk levels: {'low': 5, 'medium': 3, 'high': 0, 'critical': 1}
+2025-11-09 00:36:33 - risk_forecasting - INFO - fetch_all_data:112 - Data updated successfully
+2025-11-09 01:50:54 - risk_forecasting - INFO - __init__:20 - KRI Calculator initialized
+2025-11-09 01:50:54 - risk_forecasting - INFO - compute_credit_kris:66 - Computed 1 credit KRIs
+2025-11-09 01:50:54 - risk_forecasting - INFO - compute_market_kris:116 - Computed 2 market KRIs
+2025-11-09 01:50:54 - risk_forecasting - INFO - compute_liquidity_kris:154 - Computed 2 liquidity KRIs
+2025-11-09 01:50:54 - risk_forecasting - INFO - compute_all_kris:176 - Computed total of 5 KRIs
+2025-11-09 01:50:54 - risk_forecasting - INFO - evaluate_thresholds:233 - Risk levels: {'low': 0, 'medium': 4, 'high': 0, 'critical': 1}
+2025-11-09 01:50:54 - risk_forecasting - INFO - compute_credit_kris:66 - Computed 1 credit KRIs
+2025-11-09 01:50:54 - risk_forecasting - INFO - compute_market_kris:116 - Computed 2 market KRIs
+2025-11-09 01:50:54 - risk_forecasting - INFO - compute_liquidity_kris:154 - Computed 2 liquidity KRIs
+2025-11-09 01:50:54 - risk_forecasting - INFO - compute_all_kris:176 - Computed total of 5 KRIs
+2025-11-09 01:50:54 - risk_forecasting - INFO - evaluate_thresholds:233 - Risk levels: {'low': 0, 'medium': 4, 'high': 0, 'critical': 1}
+2025-11-09 01:50:54 - risk_forecasting - INFO - compute_credit_kris:66 - Computed 1 credit KRIs
+2025-11-09 01:50:54 - risk_forecasting - INFO - compute_market_kris:116 - Computed 2 market KRIs
+2025-11-09 01:50:54 - risk_forecasting - INFO - compute_liquidity_kris:154 - Computed 2 liquidity KRIs
+2025-11-09 01:50:54 - risk_forecasting - INFO - compute_all_kris:176 - Computed total of 5 KRIs
+2025-11-09 01:50:54 - risk_forecasting - INFO - evaluate_thresholds:233 - Risk levels: {'low': 0, 'medium': 4, 'high': 0, 'critical': 1}
+2025-11-09 01:50:54 - risk_forecasting - INFO - compute_credit_kris:66 - Computed 1 credit KRIs
+2025-11-09 01:50:54 - risk_forecasting - INFO - compute_market_kris:116 - Computed 2 market KRIs
+2025-11-09 01:50:54 - risk_forecasting - INFO - compute_liquidity_kris:154 - Computed 2 liquidity KRIs
+2025-11-09 01:50:54 - risk_forecasting - INFO - compute_all_kris:176 - Computed total of 5 KRIs
+2025-11-09 01:50:54 - risk_forecasting - INFO - evaluate_thresholds:233 - Risk levels: {'low': 0, 'medium': 4, 'high': 0, 'critical': 1}
+2025-11-09 01:50:54 - risk_forecasting - INFO - compute_credit_kris:66 - Computed 1 credit KRIs
+2025-11-09 01:50:54 - risk_forecasting - INFO - compute_market_kris:116 - Computed 2 market KRIs
+2025-11-09 01:50:54 - risk_forecasting - INFO - compute_liquidity_kris:154 - Computed 2 liquidity KRIs
+2025-11-09 01:50:54 - risk_forecasting - INFO - compute_all_kris:176 - Computed total of 5 KRIs
+2025-11-09 01:50:54 - risk_forecasting - INFO - evaluate_thresholds:233 - Risk levels: {'low': 0, 'medium': 4, 'high': 0, 'critical': 1}

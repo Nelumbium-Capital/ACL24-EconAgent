@@ -1,0 +1,15 @@
+{
+  "version": "20251109_000531",
+  "fetch_date": "2025-11-09T00:05:31.564468",
+  "series_ids": [
+    "UNRATE",
+    "CPIAUCSL",
+    "FEDFUNDS",
+    "BAA10Y"
+  ],
+  "start_date": "2018-02-28",
+  "end_date": "2023-12-31",
+  "frequency": "monthly",
+  "n_observations": 71,
+  "missing_values": {}
+}

@@ -3,16 +3,24 @@ Configuration management for US Financial Risk Forecasting System.
 """
 from pathlib import Path
 from typing import Optional
-from pydantic_settings import BaseSettings
+try:
+    from pydantic_settings import BaseSettings
+except ImportError:
+    from pydantic import BaseSettings
 
 
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
     
     # API Keys
-    fred_api_key: str
+    fred_api_key: str = ""
     wrds_username: Optional[str] = None
     wrds_password: Optional[str] = None
+    
+    # LLM Configuration
+    nemotron_url: str = "http://localhost:8000/v1"
+    ollama_url: str = "http://localhost:11434/v1"
+    ngc_api_key: str = ""
     
     # Data Settings
     data_cache_dir: Path = Path("data/cache")
@@ -40,7 +48,11 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
+        extra = "ignore"
 
 
 # Global settings instance
-settings = Settings()
+try:
+    settings = Settings(_env_file=Path(__file__).parent / ".env")
+except Exception:
+    settings = Settings()
