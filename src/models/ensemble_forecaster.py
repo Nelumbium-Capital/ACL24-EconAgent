@@ -124,6 +124,187 @@ class EnsembleForecaster(BaseForecaster):
         
         return self
     
+    def optimize_weights_rolling_cv(
+        self,
+        data: pd.Series,
+        window_size: int = 36,
+        trend_window: int = 6,
+        forecast_horizon: int = 1
+    ) -> np.ndarray:
+        """
+        Optimize weights using rolling cross-validation with trend adjustment.
+        
+        Implements the strategy from EconAgent spec:
+        1. Score each model on rolling CV (last 36 months sliding windows)
+        2. Compute normalized inverse RMSE as base weight
+        3. Calculate recent_trend = (value_now - value_6_months_ago) / 6
+        4. Apply ±10% weight adjustment to prefer trend-capturing models
+        5. Normalize to sum 1
+        
+        Args:
+            data: Full time series data
+            window_size: Size of each training window (months)
+            trend_window: Window for trend calculation (months)
+            forecast_horizon: Forecast horizon for evaluation
+            
+        Returns:
+            Optimized weight array
+        """
+        logger.info(f"Running rolling CV with window_size={window_size}, trend_window={trend_window}")
+        
+        if len(data) < window_size + forecast_horizon:
+            logger.warning("Insufficient data for rolling CV, falling back to simple validation")
+            return self._optimize_weights_simple(data[-12:] if len(data) >= 12 else data)
+        
+        # Collect errors from rolling windows
+        model_errors = {i: [] for i in range(self.n_models)}
+        model_trend_errors = {i: [] for i in range(self.n_models)}
+        
+        # Calculate actual trend
+        if len(data) >= trend_window:
+            recent_trend = (data.iloc[-1] - data.iloc[-trend_window]) / trend_window
+        else:
+            recent_trend = 0.0
+        
+        logger.info(f"Recent trend: {recent_trend:.6f}")
+        
+        # Rolling cross-validation
+        n_windows = min(12, len(data) - window_size - forecast_horizon)  # Up to 12 windows
+        
+        for i in range(n_windows):
+            # Define train/test split
+            test_end = len(data) - i * forecast_horizon
+            test_start = test_end - forecast_horizon
+            train_end = test_start
+            train_start = train_end - window_size
+            
+            if train_start < 0:
+                break
+            
+            train_data = data.iloc[train_start:train_end]
+            test_data = data.iloc[test_start:test_end]
+            
+            # Evaluate each model on this window
+            for model_idx, model in enumerate(self.models):
+                try:
+                    # Fit model on training window
+                    model_copy = self._clone_model(model)
+                    model_copy.fit(train_data)
+                    
+                    # Generate forecast
+                    result = model_copy.forecast(horizon=forecast_horizon)
+                    if isinstance(result, dict):
+                        first_var = list(result.keys())[0]
+                        pred = result[first_var].point_forecast
+                    else:
+                        pred = result.point_forecast
+                    
+                    # Calculate RMSE
+                    actual = test_data.values
+                    rmse = np.sqrt(np.mean((pred - actual) ** 2))
+                    model_errors[model_idx].append(rmse)
+                    
+                    # Calculate trend-capture error
+                    if len(pred) >= 2:
+                        pred_trend = (pred[-1] - pred[0]) / len(pred)
+                        actual_trend = (actual[-1] - actual[0]) / len(actual)
+                        trend_error = abs(pred_trend - actual_trend)
+                        model_trend_errors[model_idx].append(trend_error)
+                    
+                except Exception as e:
+                    logger.warning(f"Model {model.name} failed on window {i}: {e}")
+                    model_errors[model_idx].append(float('inf'))
+                    model_trend_errors[model_idx].append(float('inf'))
+        
+        # Compute base weights from average RMSE
+        avg_rmse = np.array([np.mean(errors) if errors else float('inf') 
+                             for errors in model_errors.values()])
+        
+        # Inverse RMSE weighting
+        inv_rmse = 1.0 / (avg_rmse + 1e-8)
+        base_weights = inv_rmse / np.sum(inv_rmse)
+        
+        logger.info(f"Base weights (inverse RMSE): {base_weights}")
+        logger.info(f"Model RMSEs: {avg_rmse}")
+        
+        # Compute trend adjustment
+        avg_trend_error = np.array([np.mean(errors) if errors else float('inf')
+                                    for errors in model_trend_errors.values()])
+        
+        # Models with lower trend error get bonus (up to ±10%)
+        if np.any(np.isfinite(avg_trend_error)):
+            # Normalize trend errors to [-1, 1] range
+            min_trend_err = np.min(avg_trend_error[np.isfinite(avg_trend_error)])
+            max_trend_err = np.max(avg_trend_error[np.isfinite(avg_trend_error)])
+            
+            if max_trend_err > min_trend_err:
+                normalized_trend_err = (avg_trend_error - min_trend_err) / (max_trend_err - min_trend_err)
+                # Convert to bonus: best gets +10%, worst gets -10%
+                trend_adjustment = 0.1 * (1 - 2 * normalized_trend_err)
+            else:
+                trend_adjustment = np.zeros(self.n_models)
+        else:
+            trend_adjustment = np.zeros(self.n_models)
+        
+        # Apply trend adjustment to base weights
+        adjusted_weights = base_weights * (1 + trend_adjustment)
+        
+        # Ensure non-negative and normalize
+        adjusted_weights = np.maximum(adjusted_weights, 0.0)
+        adjusted_weights = adjusted_weights / np.sum(adjusted_weights)
+        
+        # Store metadata
+        self.validation_errors = avg_rmse
+        self.training_metadata['rolling_cv_windows'] = n_windows
+        self.training_metadata['trend_adjustment'] = trend_adjustment.tolist()
+        self.training_metadata['avg_rmse'] = avg_rmse.tolist()
+        
+        logger.info(f"Trend adjustments: {trend_adjustment}")
+        logger.info(f"Final adjusted weights: {adjusted_weights}")
+        
+        return adjusted_weights
+    
+    def _optimize_weights_simple(self, validation_data: pd.Series) -> np.ndarray:
+        """Fallback simple weight optimization (original method)."""
+        horizon = min(len(validation_data), 12)
+        forecasts = []
+        errors = []
+        
+        for model in self.models:
+            try:
+                result = model.forecast(horizon=horizon)
+                if isinstance(result, dict):
+                    first_var = list(result.keys())[0]
+                    pred = result[first_var].point_forecast
+                else:
+                    pred = result.point_forecast
+                
+                forecasts.append(pred[:horizon])
+                actual = validation_data.values[:horizon]
+                error = np.sqrt(np.mean((pred[:horizon] - actual) ** 2))
+                errors.append(error)
+                
+            except Exception as e:
+                logger.error(f"Error generating forecast for {model.name}: {e}")
+                forecasts.append(np.zeros(horizon))
+                errors.append(float('inf'))
+        
+        errors = np.array(errors)
+        inv_errors = 1.0 / (errors + 1e-8)
+        weights = inv_errors / np.sum(inv_errors)
+        
+        self.validation_errors = errors
+        return weights
+    
+    def _clone_model(self, model):
+        """Create a fresh copy of a model for CV."""
+        import copy
+        try:
+            return copy.deepcopy(model.__class__.__name__)
+        except:
+            # If deepcopy fails, create new instance with same params
+            return model.__class__(name=model.name)
+    
     def _optimize_weights(self, validation_data: pd.Series):
         """
         Optimize ensemble weights based on validation performance.
@@ -132,6 +313,16 @@ class EnsembleForecaster(BaseForecaster):
             validation_data: Validation time series data
         """
         logger.info(f"Optimizing weights using method: {self.weight_optimization}")
+        
+        # Use rolling CV if enough data
+        if self.weight_optimization in ['optimize', 'dynamic'] and len(self.training_data) >= 36:
+            weights = self.optimize_weights_rolling_cv(
+                data=self.training_data,
+                window_size=36,
+                trend_window=6
+            )
+            self.weights = weights
+            return
         
         # Generate forecasts from all models
         horizon = min(len(validation_data), 12)  # Use up to 12 steps for validation

@@ -1,0 +1,109 @@
+/Users/cameronmalloy/ACL24-EconAgent/src/api/server.py:164: DeprecationWarning: 
+        on_event is deprecated, use lifespan event handlers instead.
+
+        Read more about it in the
+        [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+        
+  @app.on_event("startup")
+2025-11-16 22:38:09 - risk_forecasting - INFO - Starting Risk Forecasting API server...
+2025-11-16 22:38:09 - risk_forecasting - INFO - API will be available at: http://localhost:8000
+2025-11-16 22:38:09 - risk_forecasting - INFO - API docs at: http://localhost:8000/docs
+INFO:     Started server process [59951]
+INFO:     Waiting for application startup.
+2025-11-16 22:38:09 - risk_forecasting - INFO - Fetching data for API...
+2025-11-16 22:38:09 - risk_forecasting - INFO - FRED Client initialized with cache dir: data/cache
+2025-11-16 22:38:09 - risk_forecasting - INFO - DataPipeline initialized with output dir: data/processed
+2025-11-16 22:38:09 - risk_forecasting - INFO - MissingValueHandler initialized with method: ffill
+2025-11-16 22:38:09 - risk_forecasting - INFO - FrequencyAligner initialized with frequency: M
+2025-11-16 22:38:09 - risk_forecasting - INFO - Processing 4 series through pipeline
+2025-11-16 22:38:09 - risk_forecasting - INFO - Fetching series from FRED
+2025-11-16 22:38:09 - risk_forecasting - INFO - Fetching 4 series concurrently
+2025-11-16 22:38:09 - risk_forecasting - INFO - Loaded CPIAUCSL from cache (93 observations)
+2025-11-16 22:38:09 - risk_forecasting - INFO - Loaded FEDFUNDS from cache (94 observations)
+2025-11-16 22:38:09 - risk_forecasting - INFO - Loaded UNRATE from cache (92 observations)
+2025-11-16 22:38:09 - risk_forecasting - INFO - Loaded BAA10Y from cache (2054 observations)
+2025-11-16 22:38:09 - risk_forecasting - INFO - Successfully fetched 4/4 series
+/Users/cameronmalloy/ACL24-EconAgent/src/data/pipeline.py:51: FutureWarning: Series.fillna with 'method' is deprecated and will raise in a future version. Use obj.ffill() or obj.bfill() instead.
+  df['value'] = df['value'].fillna(method='ffill')
+2025-11-16 22:38:09 - risk_forecasting - INFO - inflation: Handled 1 missing values (1 remaining)
+2025-11-16 22:38:09 - risk_forecasting - INFO - credit_spread: Handled 90 missing values (1 remaining)
+/Users/cameronmalloy/ACL24-EconAgent/src/data/pipeline.py:103: FutureWarning: 'M' is deprecated and will be removed in a future version, please use 'ME' instead.
+  df_resampled = df_numeric.resample(self.target_frequency).mean()
+/Users/cameronmalloy/ACL24-EconAgent/src/data/pipeline.py:103: FutureWarning: 'M' is deprecated and will be removed in a future version, please use 'ME' instead.
+  df_resampled = df_numeric.resample(self.target_frequency).mean()
+/Users/cameronmalloy/ACL24-EconAgent/src/data/pipeline.py:103: FutureWarning: 'M' is deprecated and will be removed in a future version, please use 'ME' instead.
+  df_resampled = df_numeric.resample(self.target_frequency).mean()
+/Users/cameronmalloy/ACL24-EconAgent/src/data/pipeline.py:103: FutureWarning: 'M' is deprecated and will be removed in a future version, please use 'ME' instead.
+  df_resampled = df_numeric.resample(self.target_frequency).mean()
+2025-11-16 22:38:09 - risk_forecasting - INFO - Common date range: 2018-02-28 00:00:00 to 2025-08-31 00:00:00
+2025-11-16 22:38:09 - risk_forecasting - INFO - Saved versioned dataset: 20251116_223809
+2025-11-16 22:38:09 - risk_forecasting - INFO - Pipeline complete: 91 observations, 4 series
+2025-11-16 22:38:09 - risk_forecasting - INFO - Generating forecasts with ARIMA + ETS Ensemble...
+2025-11-16 22:38:09 - risk_forecasting - INFO - Fitting ARIMA model to 91 observations
+2025-11-16 22:38:09 - risk_forecasting - INFO - Automatically determining optimal ARIMA order
+2025-11-16 22:38:09 - risk_forecasting - WARNING - pmdarima not available, using default order (1,1,1)
+2025-11-16 22:38:09 - risk_forecasting - INFO - Selected order: (1, 1, 1)
+2025-11-16 22:38:09 - risk_forecasting - INFO - Fitting ARIMA model with order: (1, 1, 1)
+2025-11-16 22:38:09 - risk_forecasting - INFO - Model fitted successfully. AIC: 281.03, BIC: 288.46
+2025-11-16 22:38:09 - risk_forecasting - INFO - Generating 12-step forecast with 95.0% confidence
+2025-11-16 22:38:09 - risk_forecasting - INFO - Forecast generated successfully
+2025-11-16 22:38:09 - risk_forecasting - INFO - Fitting ETS model to 91 observations
+2025-11-16 22:38:09 - risk_forecasting - INFO - Fitting ETS model: trend=add, seasonal=None, seasonal_periods=None, damped=False
+2025-11-16 22:38:09 - risk_forecasting - INFO - Model fitted successfully. AIC: 35.55, BIC: 45.60
+2025-11-16 22:38:09 - risk_forecasting - INFO - Generating 12-step forecast with 95.0% confidence
+2025-11-16 22:38:09 - risk_forecasting - INFO - Forecast generated successfully
+2025-11-16 22:38:09 - risk_forecasting - INFO - ✓ unemployment: ARIMA+ETS ensemble generated (12-month ahead)
+2025-11-16 22:38:09 - risk_forecasting - INFO - Fitting ARIMA model to 91 observations
+2025-11-16 22:38:09 - risk_forecasting - INFO - Automatically determining optimal ARIMA order
+2025-11-16 22:38:09 - risk_forecasting - WARNING - pmdarima not available, using default order (1,1,1)
+2025-11-16 22:38:09 - risk_forecasting - INFO - Selected order: (1, 1, 1)
+2025-11-16 22:38:09 - risk_forecasting - INFO - Fitting ARIMA model with order: (1, 1, 1)
+2025-11-16 22:38:09 - risk_forecasting - INFO - Model fitted successfully. AIC: -794.25, BIC: -786.82
+2025-11-16 22:38:09 - risk_forecasting - INFO - Generating 12-step forecast with 95.0% confidence
+2025-11-16 22:38:09 - risk_forecasting - INFO - Forecast generated successfully
+2025-11-16 22:38:09 - risk_forecasting - INFO - Fitting ETS model to 91 observations
+2025-11-16 22:38:09 - risk_forecasting - INFO - Fitting ETS model: trend=add, seasonal=None, seasonal_periods=None, damped=False
+2025-11-16 22:38:09 - risk_forecasting - INFO - Model fitted successfully. AIC: -1078.11, BIC: -1068.06
+2025-11-16 22:38:09 - risk_forecasting - INFO - Generating 12-step forecast with 95.0% confidence
+2025-11-16 22:38:09 - risk_forecasting - INFO - Forecast generated successfully
+2025-11-16 22:38:09 - risk_forecasting - INFO - ✓ inflation: ARIMA+ETS ensemble generated (12-month ahead)
+2025-11-16 22:38:09 - risk_forecasting - INFO - Fitting ARIMA model to 91 observations
+2025-11-16 22:38:09 - risk_forecasting - INFO - Automatically determining optimal ARIMA order
+2025-11-16 22:38:09 - risk_forecasting - WARNING - pmdarima not available, using default order (1,1,1)
+2025-11-16 22:38:09 - risk_forecasting - INFO - Selected order: (1, 1, 1)
+2025-11-16 22:38:09 - risk_forecasting - INFO - Fitting ARIMA model with order: (1, 1, 1)
+2025-11-16 22:38:09 - risk_forecasting - INFO - Model fitted successfully. AIC: -70.69, BIC: -63.26
+2025-11-16 22:38:09 - risk_forecasting - INFO - Generating 12-step forecast with 95.0% confidence
+2025-11-16 22:38:09 - risk_forecasting - INFO - Forecast generated successfully
+2025-11-16 22:38:09 - risk_forecasting - INFO - Fitting ETS model to 91 observations
+2025-11-16 22:38:09 - risk_forecasting - INFO - Fitting ETS model: trend=add, seasonal=None, seasonal_periods=None, damped=False
+2025-11-16 22:38:09 - risk_forecasting - INFO - Model fitted successfully. AIC: -325.96, BIC: -315.92
+2025-11-16 22:38:09 - risk_forecasting - INFO - Generating 12-step forecast with 95.0% confidence
+2025-11-16 22:38:09 - risk_forecasting - INFO - Forecast generated successfully
+2025-11-16 22:38:09 - risk_forecasting - INFO - ✓ interest_rate: ARIMA+ETS ensemble generated (12-month ahead)
+2025-11-16 22:38:09 - risk_forecasting - INFO - Fitting ARIMA model to 91 observations
+2025-11-16 22:38:09 - risk_forecasting - INFO - Automatically determining optimal ARIMA order
+2025-11-16 22:38:09 - risk_forecasting - WARNING - pmdarima not available, using default order (1,1,1)
+2025-11-16 22:38:09 - risk_forecasting - INFO - Selected order: (1, 1, 1)
+2025-11-16 22:38:09 - risk_forecasting - INFO - Fitting ARIMA model with order: (1, 1, 1)
+2025-11-16 22:38:09 - risk_forecasting - INFO - Model fitted successfully. AIC: -42.22, BIC: -34.79
+2025-11-16 22:38:09 - risk_forecasting - INFO - Generating 12-step forecast with 95.0% confidence
+2025-11-16 22:38:09 - risk_forecasting - INFO - Forecast generated successfully
+2025-11-16 22:38:09 - risk_forecasting - INFO - Fitting ETS model to 91 observations
+2025-11-16 22:38:09 - risk_forecasting - INFO - Fitting ETS model: trend=add, seasonal=None, seasonal_periods=None, damped=False
+2025-11-16 22:38:09 - risk_forecasting - INFO - Model fitted successfully. AIC: -300.90, BIC: -290.86
+2025-11-16 22:38:09 - risk_forecasting - INFO - Generating 12-step forecast with 95.0% confidence
+2025-11-16 22:38:09 - risk_forecasting - INFO - Forecast generated successfully
+2025-11-16 22:38:09 - risk_forecasting - INFO - ✓ credit_spread: ARIMA+ETS ensemble generated (12-month ahead)
+2025-11-16 22:38:09 - risk_forecasting - INFO - Forecasts extend from 2025-09-30 to 2026-08-31
+2025-11-16 22:38:09 - risk_forecasting - INFO - KRI Calculator initialized
+2025-11-16 22:38:09 - risk_forecasting - INFO - Computed 4 credit KRIs
+2025-11-16 22:38:09 - risk_forecasting - INFO - Computed 3 market KRIs
+2025-11-16 22:38:09 - risk_forecasting - INFO - Computed 2 liquidity KRIs
+2025-11-16 22:38:09 - risk_forecasting - INFO - Computed total of 9 KRIs
+2025-11-16 22:38:09 - risk_forecasting - INFO - Risk levels: {'low': 4, 'medium': 4, 'high': 0, 'critical': 1}
+2025-11-16 22:38:09 - risk_forecasting - INFO - Data updated successfully
+INFO:     Application startup complete.
+ERROR:    [Errno 48] error while attempting to bind on address ('0.0.0.0', 8000): [errno 48] address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.

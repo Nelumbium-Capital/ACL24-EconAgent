@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Download, FileText, Mail, Calendar } from 'lucide-react';
 import Card from '../components/ui/Card';
-import { apiService } from '../services/api';
-import { DashboardSummary, KRI } from '../types';
+import { apiService, DashboardSummary, KRI } from '../services/api';
 
 const Reports: React.FC = () => {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);

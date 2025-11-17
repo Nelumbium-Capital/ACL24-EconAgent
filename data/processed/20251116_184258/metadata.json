@@ -1,0 +1,12 @@
+{
+  "version": "20251116_184258",
+  "fetch_date": "2025-11-16T18:42:58.766953",
+  "series_ids": [
+    "UNRATE"
+  ],
+  "start_date": "2020-01-01",
+  "end_date": "2025-08-01",
+  "frequency": "monthly",
+  "n_observations": 68,
+  "missing_values": {}
+}

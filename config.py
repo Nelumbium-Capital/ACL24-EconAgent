@@ -37,6 +37,16 @@ class Settings(BaseSettings):
     n_firms: int = 50
     simulation_steps: int = 100
     
+    # LLM Agent Settings
+    use_llm_agents: bool = True
+    llm_batch_size: int = 64
+    reflection_frequency: int = 3  # months
+    memory_window: int = 6  # months
+    
+    # Ensemble Settings
+    rolling_cv_window: int = 36  # months
+    trend_window: int = 6  # months
+    
     # Dashboard Settings
     dashboard_port: int = 8050
     auto_refresh_interval: int = 60

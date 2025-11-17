@@ -25,8 +25,12 @@ class RiskSimulationModel(Model):
         self,
         n_banks: int = 10,
         n_firms: int = 50,
+        n_workers: int = 0,
         scenario=None,
-        random_seed: Optional[int] = None
+        random_seed: Optional[int] = None,
+        use_llm_agents: bool = False,
+        reflection_frequency: int = 3,
+        batch_size: int = 64
     ):
         """
         Initialize the risk simulation model.
@@ -34,13 +38,21 @@ class RiskSimulationModel(Model):
         Args:
             n_banks: Number of bank agents
             n_firms: Number of firm agents
+            n_workers: Number of LLM worker agents (0 = disabled)
             scenario: Economic scenario to apply (default: None for baseline)
             random_seed: Random seed for reproducibility
+            use_llm_agents: Whether to use LLM-based agents
+            reflection_frequency: Months between agent reflections
+            batch_size: Batch size for LLM calls
         """
         super().__init__(seed=random_seed)
         self.n_banks = n_banks
         self.n_firms = n_firms
+        self.n_workers = n_workers
         self.scenario = scenario
+        self.use_llm_agents = use_llm_agents
+        self.reflection_frequency = reflection_frequency
+        self.batch_size = batch_size
         
         # Set numpy random seed if provided
         if random_seed is not None:
@@ -51,6 +63,7 @@ class RiskSimulationModel(Model):
         self.gdp_growth = 0.02  # 2% baseline
         self.interest_rate = 0.03  # 3% baseline
         self.credit_spread = 0.02  # 2% baseline
+        self.inflation_rate = 0.03  # 3% baseline
         
         # Track simulation step
         self.current_step = 0
@@ -81,7 +94,10 @@ class RiskSimulationModel(Model):
         self._create_firms()
         self._create_network()
         
-        logger.info(f"Initialized simulation with {n_banks} banks and {n_firms} firms")
+        if n_workers > 0:
+            self._create_workers()
+        
+        logger.info(f"Initialized simulation with {n_banks} banks, {n_firms} firms, and {n_workers} workers (LLM={use_llm_agents})")
     
     def _create_banks(self):
         """Initialize bank agents with balance sheets."""
@@ -105,6 +121,32 @@ class RiskSimulationModel(Model):
                 model=self,
                 borrowing_need=borrowing_need,
                 base_default_probability=default_probability
+            )
+    
+    def _create_workers(self):
+        """Initialize worker agents with LLM decision-making."""
+        if WorkerAgent is None:
+            logger.warning("WorkerAgent not available, skipping worker creation")
+            return
+            
+        for i in range(self.n_workers):
+            initial_savings = self.random.uniform(3000, 10000)
+            wage = self.random.uniform(3000, 6000)
+            # Use randint instead of normal for Mesa compatibility
+            age = self.random.randint(25, 60)
+            
+            # Create unique ID manually
+            worker_id = 1000 + i  # Start at 1000 to avoid conflicts with banks/firms
+            
+            worker = WorkerAgent(
+                unique_id=worker_id,
+                model=self,
+                age=age,
+                occupation="worker",
+                location="City",
+                initial_savings=initial_savings,
+                wage=wage,
+                use_llm=self.use_llm_agents
             )
     
     def _create_network(self):
@@ -214,3 +256,11 @@ class RiskSimulationModel(Model):
 
 # Import agents after class definition to avoid circular imports
 from .agents import BankAgent, FirmAgent
+
+# Import LLM agents if available
+try:
+    from src.agents.econagent import WorkerAgent, FirmAgentLLM
+except ImportError:
+    WorkerAgent = None
+    FirmAgentLLM = None
+    logger.warning("LLM agents not available, LLM mode will be disabled")

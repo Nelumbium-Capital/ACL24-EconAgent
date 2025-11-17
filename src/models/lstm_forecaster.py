@@ -318,8 +318,7 @@ class LSTMForecaster(BaseForecaster):
             optimizer,
             mode='min',
             factor=self.lr_scheduler_factor,
-            patience=self.lr_scheduler_patience,
-            verbose=True
+            patience=self.lr_scheduler_patience
         )
         
         best_val_loss = float('inf')

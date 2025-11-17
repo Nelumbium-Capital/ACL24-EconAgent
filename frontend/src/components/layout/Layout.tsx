@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { BarChart3, TrendingUp, Activity, FileText, AlertTriangle } from 'lucide-react';
+import { BarChart3, TrendingUp, Activity, FileText, AlertTriangle, Layers } from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -14,6 +14,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { path: '/risk-analysis', label: 'Risk Analysis', icon: AlertTriangle },
     { path: '/market-dynamics', label: 'Market Dynamics', icon: Activity },
     { path: '/forecasting', label: 'Forecasting', icon: TrendingUp },
+    { path: '/scenarios', label: 'Scenarios', icon: Layers },
     { path: '/reports', label: 'Reports', icon: FileText },
   ];
 

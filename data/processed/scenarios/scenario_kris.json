@@ -1,0 +1,38 @@
+{
+  "baseline": {
+    "default_rate": 0.14,
+    "system_liquidity": 0.12800379967424144,
+    "avg_capital_ratio": -45.62366419588542,
+    "network_stress": 0.27699999999999997,
+    "max_default_rate": 0.14,
+    "min_liquidity": 0.07236311839114253,
+    "scenario": "baseline"
+  },
+  "recession": {
+    "default_rate": 0.16,
+    "system_liquidity": 0.1321096616478059,
+    "avg_capital_ratio": -70.25128078088268,
+    "network_stress": 0.337,
+    "max_default_rate": 0.16,
+    "min_liquidity": 0.07236311839114253,
+    "scenario": "recession"
+  },
+  "rate_shock": {
+    "default_rate": 0.18,
+    "system_liquidity": 0.13066443143840972,
+    "avg_capital_ratio": -152.94704246176096,
+    "network_stress": 0.36,
+    "max_default_rate": 0.18,
+    "min_liquidity": 0.07236311839114253,
+    "scenario": "rate_shock"
+  },
+  "credit_crisis": {
+    "default_rate": 0.18,
+    "system_liquidity": 0.13213152163759587,
+    "avg_capital_ratio": -149.4044497285201,
+    "network_stress": 0.369,
+    "max_default_rate": 0.18,
+    "min_liquidity": 0.07236311839114253,
+    "scenario": "credit_crisis"
+  }
+}

@@ -203,6 +203,7 @@ class KRICalculator:
             # Determine risk level based on thresholds
             # Note: Some KRIs are "lower is better" (e.g., default rate)
             # Others are "higher is better" (e.g., liquidity ratio)
+            # Special handling for negative thresholds (e.g., deposit_flow_ratio)
             
             if kri_name in ['liquidity_coverage_ratio', 'credit_quality_score']:
                 # Higher is better
@@ -214,8 +215,19 @@ class KRICalculator:
                     alerts[kri_name] = RiskLevel.HIGH
                 else:
                     alerts[kri_name] = RiskLevel.CRITICAL
+            elif all(v < 0 for v in thresholds.values()):
+                # Negative thresholds (e.g., deposit_flow_ratio: -5, -10, -15, -25)
+                # More negative = worse, so -2 is better than -5
+                if kri_value >= thresholds['low']:  # e.g., -2 >= -5 is True = LOW
+                    alerts[kri_name] = RiskLevel.LOW
+                elif kri_value >= thresholds['medium']:  # e.g., -7 >= -10 is True = MEDIUM
+                    alerts[kri_name] = RiskLevel.MEDIUM
+                elif kri_value >= thresholds['high']:
+                    alerts[kri_name] = RiskLevel.HIGH
+                else:
+                    alerts[kri_name] = RiskLevel.CRITICAL
             else:
-                # Lower is better (most KRIs)
+                # Lower is better (most KRIs) - positive thresholds
                 if kri_value <= thresholds['low']:
                     alerts[kri_name] = RiskLevel.LOW
                 elif kri_value <= thresholds['medium']:
