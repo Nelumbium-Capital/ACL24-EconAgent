@@ -170,23 +170,145 @@ class RiskSimulationModel(Model):
                 bank.reserves -= loan_amount
     
     def step(self):
-        """Execute one simulation step."""
+        """Execute one simulation step with batch LLM processing for efficiency."""
         # Apply scenario shocks if scenario is defined
         if self.scenario is not None:
             self.scenario.apply_shock(self, self.current_step)
-        
-        # Agents make decisions - iterate through all agents
-        for agent in self.agents:
-            agent.step()
-        
+
+        # Separate LLM-based and traditional agents
+        if self.use_llm_agents:
+            llm_agents = [agent for agent in self.agents if hasattr(agent, 'use_llm') and agent.use_llm]
+            traditional_agents = [agent for agent in self.agents if not (hasattr(agent, 'use_llm') and agent.use_llm)]
+
+            # Process traditional agents normally
+            for agent in traditional_agents:
+                agent.step()
+
+            # Batch process LLM agents for efficiency
+            if llm_agents:
+                self._batch_step_llm_agents(llm_agents)
+
+            # Check for quarterly reflections
+            if self.current_step > 0 and self.current_step % self.reflection_frequency == 0:
+                logger.info(f"Step {self.current_step}: Triggering quarterly agent reflections")
+                self._trigger_agent_reflections(llm_agents)
+        else:
+            # Traditional processing: iterate through all agents
+            for agent in self.agents:
+                agent.step()
+
         # Increment step counter
         self.current_step += 1
-        
+
         # Collect data
         self.datacollector.collect(self)
-        
+
         logger.debug(f"Step {self.current_step}: Default rate = {self.compute_default_rate():.4f}")
-    
+
+    def _batch_step_llm_agents(self, llm_agents: List[Agent]):
+        """
+        Batch process LLM agent decisions for efficiency.
+
+        According to EconAgent paper, batch LLM calls reduce latency significantly.
+        """
+        from src.models.batch_llm_client import get_batch_client
+
+        if not llm_agents:
+            return
+
+        # Build prompts for all LLM agents
+        prompts = []
+        agent_map = {}
+
+        for agent in llm_agents:
+            if hasattr(agent, 'build_decision_prompt'):
+                prompt = agent.build_decision_prompt(
+                    economic_state={
+                        'unemployment': self.unemployment_rate,
+                        'inflation': self.inflation_rate,
+                        'interest_rate': self.interest_rate,
+                        'credit_spread': self.credit_spread,
+                        'gdp_growth': self.gdp_growth
+                    }
+                )
+                prompts.append(prompt)
+                agent_map[len(prompts) - 1] = agent
+            else:
+                # If agent doesn't have LLM interface, step normally
+                agent.step()
+
+        # Batch LLM inference
+        if prompts:
+            client = get_batch_client()
+            try:
+                # Use simple batch inference that returns text responses
+                responses = client.batch_inference(
+                    prompts,
+                    system_prompt="You are an economic agent making decisions based on your financial state and economic conditions.",
+                    temperature=0.3,
+                    max_tokens=300
+                )
+
+                # Apply responses to agents
+                for idx, response_text in enumerate(responses):
+                    agent = agent_map.get(idx)
+                    if agent and hasattr(agent, 'apply_llm_decision'):
+                        agent.apply_llm_decision(response_text)
+                    elif agent:
+                        # Fallback: call agent's step() if no apply method
+                        agent.step()
+
+                logger.debug(f"Batch processed {len(prompts)} LLM agents")
+
+            except Exception as e:
+                logger.error(f"Batch LLM processing failed: {e}. Falling back to individual processing.")
+                # Fallback: process agents individually
+                for agent in llm_agents:
+                    agent.step()
+
+    def _trigger_agent_reflections(self, llm_agents: List[Agent]):
+        """
+        Trigger quarterly reflections for LLM agents.
+
+        Reflections help agents learn from past experiences and adjust strategies.
+        """
+        from src.models.batch_llm_client import get_batch_client
+
+        if not llm_agents:
+            return
+
+        # Build reflection prompts
+        prompts = []
+        agent_map = {}
+
+        for agent in llm_agents:
+            if hasattr(agent, 'build_reflection_prompt'):
+                prompt = agent.build_reflection_prompt()
+                prompts.append(prompt)
+                agent_map[len(prompts) - 1] = agent
+
+        # Batch reflection generation
+        if prompts:
+            client = get_batch_client()
+            try:
+                responses = client.batch_inference(
+                    prompts,
+                    system_prompt="You are an economic agent reflecting on your recent experiences and learning from them.",
+                    temperature=0.5,
+                    max_tokens=400
+                )
+
+                # Apply reflections to agents
+                for idx, response_text in enumerate(responses):
+                    agent = agent_map.get(idx)
+                    if agent and hasattr(agent, 'apply_reflection'):
+                        agent.apply_reflection(response_text)
+
+                logger.info(f"Generated reflections for {len(prompts)} agents")
+
+            except Exception as e:
+                logger.error(f"Batch reflection failed: {e}")
+
     def run_simulation(self, n_steps: int = 100) -> pd.DataFrame:
         """
         Run full simulation and return results.

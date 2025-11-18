@@ -66,13 +66,17 @@ const MarketDynamics: React.FC = () => {
     inflation_vol: inflationVol[i]
   }));
 
-  // Calculate momentum (rate of change)
+  // Calculate momentum (percentage change month-over-month)
   const momentumData = recentData.slice(1).map((d, i) => {
     const prev = recentData[i];
     return {
       date: d.date,
-      unemployment_momentum: d.unemployment - prev.unemployment,
-      inflation_momentum: (d.inflation - prev.inflation) * 100
+      unemployment_momentum: prev.unemployment !== 0
+        ? ((d.unemployment - prev.unemployment) / prev.unemployment) * 100
+        : 0,
+      inflation_momentum: prev.inflation !== 0
+        ? ((d.inflation - prev.inflation) / prev.inflation) * 100
+        : 0
     };
   });
 

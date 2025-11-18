@@ -312,49 +312,52 @@ const Forecasting: React.FC = () => {
                 year: 'numeric', 
                 month: 'long' 
               })}
-              formatter={(value: number | null) => value !== null ? `${value.toFixed(2)}${selectedMetricInfo.unit}` : 'N/A'}
+              formatter={(value: number, name: string) => [
+                `${value.toFixed(2)}${selectedMetricInfo.unit}`,
+                name === 'value' ? selectedMetricInfo.label : name
+              ]}
             />
             <Legend />
             
             {/* Confidence band */}
             <Area
-              type="monotone"
+              type="monotoneX"
               dataKey="forecast_upper"
               stroke="none"
               fill={selectedMetricInfo.color}
-              fillOpacity={0.1}
+              fillOpacity={0.15}
               connectNulls
               name="95% Confidence"
             />
             <Area
-              type="monotone"
+              type="monotoneX"
               dataKey="forecast_lower"
               stroke="none"
               fill="white"
               fillOpacity={1}
               connectNulls
             />
-            
+
             {/* Historical line (solid) */}
-            <Line 
-              type="monotone" 
-              dataKey="historical" 
+            <Line
+              type="monotoneX"
+              dataKey="historical"
               stroke={selectedMetricInfo.color}
-              strokeWidth={3}
-              dot={{ fill: selectedMetricInfo.color, r: 4 }}
-              connectNulls={false}
+              strokeWidth={2.5}
+              dot={{ fill: selectedMetricInfo.color, r: 3.5 }}
+              connectNulls={true}
               name="Historical"
             />
-            
+
             {/* Forecast line (dashed) */}
-            <Line 
-              type="monotone" 
-              dataKey="forecast" 
+            <Line
+              type="monotoneX"
+              dataKey="forecast"
               stroke={selectedMetricInfo.color}
-              strokeWidth={3}
+              strokeWidth={2.5}
               strokeDasharray="5 5"
-              dot={{ fill: selectedMetricInfo.color, r: 4, strokeDasharray: 'none' }}
-              connectNulls={false}
+              dot={{ fill: selectedMetricInfo.color, r: 3.5, strokeDasharray: 'none' }}
+              connectNulls={true}
               name="Forecast"
             />
           </ComposedChart>

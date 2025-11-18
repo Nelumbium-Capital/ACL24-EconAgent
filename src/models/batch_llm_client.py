@@ -45,7 +45,7 @@ class BatchLLMClient:
         ollama_model: str = "llama3.1",
         batch_size: int = 64,
         max_retries: int = 3,
-        timeout: int = 120
+        timeout: int = 5
     ):
         """
         Initialize batch LLM client.
@@ -385,4 +385,5 @@ def get_batch_client() -> BatchLLMClient:
     if _global_client is None:
         _global_client = BatchLLMClient()
     return _global_client
+
 
